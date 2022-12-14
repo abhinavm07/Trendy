@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
 dotenv.config();
+require("express-async-errors");
 const notfoundMiddleware = require("./middleware/notFound");
 const errorHandler = require("./middleware/errorHandler");
 
