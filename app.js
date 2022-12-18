@@ -11,6 +11,8 @@ const connectDB = require("./db/connect");
 const port = process.env.PORT || 5000;
 const route = require("./routes/routeTasks");
 
+app.use(express.json());
+
 app.use("/", route);
 app.use(notfoundMiddleware);
 app.use(errorHandler);

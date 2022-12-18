@@ -10,7 +10,7 @@ const homePage = (req, res) => {
 
 const getUser = async (req, res) => {
   try {
-    const dataOut = await data.create(req.query);
+    const dataOut = await data.create(req.body);
     res.status(200).json({ msg: dataOut });
   } catch (error) {
     console.log(error);
