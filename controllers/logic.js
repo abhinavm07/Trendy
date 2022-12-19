@@ -9,12 +9,19 @@ const homePage = (req, res) => {
 };
 
 const getUser = async (req, res) => {
-  try {
-    const dataOut = await data.create(req.body);
-    res.status(200).json({ msg: dataOut });
-  } catch (error) {
-    console.log(error);
+  const { name, username } = req.query;
+  const queryObj = {};
+
+  if (name) {
+    queryObj.name = name;
   }
+
+  if (username) {
+    queryObj.username = username;
+  }
+
+  const dataOut = await data.find(queryObj);
+  res.status(200).json({ msg: dataOut, hits: dataOut.length });
 };
 
 const getStatic = async (req, res) => {
