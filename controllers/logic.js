@@ -9,18 +9,28 @@ const homePage = (req, res) => {
 };
 
 const getUser = async (req, res) => {
-  const { name, username } = req.query;
+  const { name, username, sort } = req.query;
   const queryObj = {};
 
   if (name) {
-    queryObj.name = name;
+    //regex le chai name same to same nabhayeni edi data ma search gareko element xa bhanye dekhauxa Example: req.query ma "Abhi" aayo bhanye resunts ma Abhinab, abhii, abhinavv testo aauxa (just "abhi include bha hunu paryo"), option i ko mathlabh case insensative ho
+    //mongoose docs herney confuse bhayema
+    queryObj.name = { $regex: name, $options: "i" };
   }
 
   if (username) {
     queryObj.username = username;
   }
 
-  const dataOut = await data.find(queryObj);
+  let results = data.find(queryObj);
+  if (sort) {
+    const sortLst = sort.split(",").join(" ");
+    results = results.sort(sortLst);
+  } else {
+    results = results.sort("name");
+    console.log("From Else");
+  }
+  const dataOut = await results;
   res.status(200).json({ msg: dataOut, hits: dataOut.length });
 };
 
@@ -34,12 +44,14 @@ const getStatic = async (req, res) => {
 };
 
 const addData = async (req, res) => {
-  try {
-    const dataOut = await data.create(req.query);
-    res.status(200).json({ msg: "Successful !" });
-  } catch (error) {
-    console.log(error);
-  }
+  const dataOut = await data.create(req.query);
+  res.status(200).json({ msg: "Successful !" });
 };
 
-module.exports = { homePage, getStatic, getUser, addData };
+const deleteData = async (req, res) => {
+  const { id: dataID } = req.params;
+  const dataOut = await data.findByIdAndDelete({ _id: dataID });
+  res.status(200).json({ msg: `Data with ID : ${dataID} deleted !` });
+};
+
+module.exports = { homePage, getStatic, getUser, addData, deleteData };
