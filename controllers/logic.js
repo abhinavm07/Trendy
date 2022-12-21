@@ -9,7 +9,7 @@ const homePage = (req, res) => {
 };
 
 const getUser = async (req, res) => {
-  const { name, username, sort } = req.query;
+  const { name, username, sort, fields } = req.query;
   const queryObj = {};
 
   if (name) {
@@ -30,17 +30,23 @@ const getUser = async (req, res) => {
     results = results.sort("name");
     console.log("From Else");
   }
+  if (fields) {
+    const fieldsLst = fields.split(",").join(" ");
+    //.select lets us select the needed data from the data base
+    results = results.select(fieldsLst);
+  }
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 2;
+  const skip = (page - 1) * limit;
+  //.skip skips the number of items from the database while limit limits the amount of data supplied to the frontend at a given time.  (read Mongoose docx if confused)
+  results = results.skip(skip).limit(limit);
   const dataOut = await results;
   res.status(200).json({ msg: dataOut, hits: dataOut.length });
 };
 
 const getStatic = async (req, res) => {
-  try {
-    const dataOut = await data.find({});
-    res.status(200).json({ msg: dataOut });
-  } catch (error) {
-    console.log(error);
-  }
+  const dataOut = await data.find({});
+  res.status(200).json({ msg: dataOut });
 };
 
 const addData = async (req, res) => {
