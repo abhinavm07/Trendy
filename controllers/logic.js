@@ -1,4 +1,7 @@
 const data = require("../model/trendySchema");
+const CustomAPIError = require("../errors/custom-error");
+
+const jwt = require("jsonwebtoken");
 
 const homePage = (req, res) => {
   // throw new Error("Testing Express async error package");
@@ -44,6 +47,50 @@ const getUser = async (req, res) => {
   res.status(200).json({ msg: dataOut, hits: dataOut.length });
 };
 
+const login = async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    throw new CustomAPIError("Please provide username and password !", 400);
+  }
+
+  //creates a new date
+  const id = new Date().getDate();
+
+  //the values passed as obj are the ones that are present in the jwt token for identification or modification
+  const userToken = jwt.sign({ id, username }, process.env.JWT_Secret, {
+    expiresIn: "30d",
+  });
+  console.log({ username: username, password: password });
+
+  //you can debug the token at jwt.io
+  res.status(200).json({ msg: `User Created ${userToken}` });
+};
+
+const dashboard = (req, res) => {
+  const authHeader = req.headers.authorization;
+  // if (!authHeader || !authHeader.startWith("Bearer ")) {
+  //   console.log("Here");
+  //   throw new CustomAPIError("No token available!", 401);
+  // }
+  try {
+    //takes the second component after the split here being token
+    const token = authHeader.split(" ")[1];
+    console.log(token);
+    //verifies token and replies with data
+    const decoded = jwt.verify(token, process.env.JWT_Secret);
+    console.log(decoded);
+    const jwtToken = Math.floor(Math.random() * 100);
+    res.status(200).json({
+      msg: `Hello There ${decoded["username"]}`,
+      tokenNum: `Your Token Number is ${jwtToken}`,
+    });
+  } catch (error) {
+    console.log({ msg: error });
+  }
+};
+
+module.exports = { login, dashboard };
+
 const getStatic = async (req, res) => {
   const dataOut = await data.find({});
   res.status(200).json({ msg: dataOut });
@@ -60,4 +107,12 @@ const deleteData = async (req, res) => {
   res.status(200).json({ msg: `Data with ID : ${dataID} deleted !` });
 };
 
-module.exports = { homePage, getStatic, getUser, addData, deleteData };
+module.exports = {
+  homePage,
+  getStatic,
+  getUser,
+  addData,
+  deleteData,
+  login,
+  dashboard,
+};
