@@ -1,5 +1,5 @@
 const data = require("../model/trendySchema");
-const CustomAPIError = require("../errors/custom-error");
+const CustomAPIError = require("../error/custom-error");
 
 const jwt = require("jsonwebtoken");
 
@@ -67,29 +67,17 @@ const login = async (req, res) => {
 };
 
 const dashboard = (req, res) => {
-  const authHeader = req.headers.authorization;
   // if (!authHeader || !authHeader.startWith("Bearer ")) {
   //   console.log("Here");
   //   throw new CustomAPIError("No token available!", 401);
   // }
-  try {
-    //takes the second component after the split here being token
-    const token = authHeader.split(" ")[1];
-    console.log(token);
-    //verifies token and replies with data
-    const decoded = jwt.verify(token, process.env.JWT_Secret);
-    console.log(decoded);
-    const jwtToken = Math.floor(Math.random() * 100);
-    res.status(200).json({
-      msg: `Hello There ${decoded["username"]}`,
-      tokenNum: `Your Token Number is ${jwtToken}`,
-    });
-  } catch (error) {
-    console.log({ msg: error });
-  }
+  const jwtToken = Math.floor(Math.random() * 100);
+  res.status(200).json({
+    msg: `Hello There ${req.user.username}`,
+    tokenNum: `Your Token Number is ${jwtToken}`,
+  });
+  2;
 };
-
-module.exports = { login, dashboard };
 
 const getStatic = async (req, res) => {
   const dataOut = await data.find({});

@@ -16,5 +16,5 @@ Router.get("/add", addData);
 Router.get("/username", getUser);
 Router.delete("/:id", deleteData);
 Router.post("/login", login);
-Router.get("/dashboard", dashboard);
+Router.route("/dashboard").get(dashboard);
 module.exports = Router;
