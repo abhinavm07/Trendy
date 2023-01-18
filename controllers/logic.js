@@ -63,7 +63,7 @@ const login = async (req, res) => {
   console.log({ username: username, password: password });
 
   //you can debug the token at jwt.io
-  res.status(200).json({ msg: `User Created ${userToken}` });
+  res.status(200).json({ msg: `User Created  with token ${userToken}` });
 };
 
 const dashboard = (req, res) => {
@@ -92,7 +92,7 @@ const addData = async (req, res) => {
 const deleteData = async (req, res) => {
   const { id: dataID } = req.params;
   const dataOut = await data.findByIdAndDelete({ _id: dataID });
-  res.status(200).json({ msg: `Data with ID : ${dataID} deleted !` });
+  res.status(200).json({ msg: `Data with the ID of : ${dataID} deleted !` });
 };
 
 module.exports = {
