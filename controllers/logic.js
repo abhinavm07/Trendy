@@ -8,7 +8,7 @@ const homePage = (req, res) => {
 
   res.send("Welcome to the Home Page");
 
-  console.log("Hi Man");
+  console.log("Home-Page");
 };
 
 const getUser = async (req, res) => {
@@ -92,6 +92,7 @@ const addData = async (req, res) => {
 const deleteData = async (req, res) => {
   const { id: dataID } = req.params;
   const dataOut = await data.findByIdAndDelete({ _id: dataID });
+  console.log(dataOut);
   res.status(200).json({ msg: `Data with the ID of : ${dataID} deleted !` });
 };
 
