@@ -63,7 +63,7 @@ const login = async (req, res) => {
   console.log({ username: username, password: password });
 
   //you can debug the token at jwt.io
-  res.status(200).json({ msg: `User Created  with token ${userToken}` });
+  res.status(200).json({ msg: `User Created  with token number ${userToken}` });
 };
 
 const dashboard = (req, res) => {
