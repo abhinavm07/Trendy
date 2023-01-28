@@ -44,7 +44,7 @@ const getUser = async (req, res) => {
   //.skip skips the number of items from the database while limit limits the amount of data supplied to the frontend at a given time.  (read Mongoose docx if confused)
   results = results.skip(skip).limit(limit);
   const dataOut = await results;
-  res.status(200).json({ msg: dataOut, hits: dataOut.length });
+  res.status(200).json({ msg: dataOut, nhits: dataOut.length });
 };
 
 const login = async (req, res) => {
