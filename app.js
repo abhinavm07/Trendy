@@ -23,7 +23,7 @@ const dbConnected = async (url) => {
   try {
     await connectDB(process.env.MONGO_URI);
     app.listen(port, () => {
-      console.log("And We're LIVE !");
+      console.log(`And We're LIVE at Port ${port} !`);
     });
     console.log("Hello There");
   } catch (error) {

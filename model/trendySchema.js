@@ -9,6 +9,13 @@ const appSchema = new mongoose.Schema({
     type: String,
     // required: [true, "Username can't be empty"],
   },
+  email: {
+    type: String,
+    // required: [true, "Username can't be empty"],
+  },
+  password: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("Trendy", appSchema);
