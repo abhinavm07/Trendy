@@ -2,7 +2,6 @@ const model = require("../model/trendySchema");
 const CustomAPIError = require("../error/custom-error");
 
 const jwt = require("jsonwebtoken");
-// const { models } = require("mongoose");
 
 const bcrypt = require("bcrypt");
 
