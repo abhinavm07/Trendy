@@ -5,6 +5,17 @@ const jwt = require("jsonwebtoken");
 
 const bcrypt = require("bcrypt");
 
+const aposToLexForm = require("apos-to-lex-form");
+const { WordTokenizer, SentimentAnalyzer, PorterStemmer } = require("natural");
+const SpellCorrector = require("spelling-corrector");
+const stopword = require("stopword");
+
+const tokenizer = new WordTokenizer();
+const spellCorrector = new SpellCorrector();
+spellCorrector.loadDictionary();
+
+const analyzer = new SentimentAnalyzer("English", PorterStemmer, "afinn");
+
 const homePage = (req, res) => {
   // throw new Error("Testing Express async error package");
 
