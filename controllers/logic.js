@@ -163,6 +163,50 @@ const deleteData = async (req, res) => {
   res.status(200).json({ msg: `model with the ID of : ${dataID} deleted !` });
 };
 
+const emotion = (req, res) => {
+  const { data } = req.body;
+
+  console.log("Hello");
+
+  const sentiment = getSentiment(data);
+
+  if (sentiment === 1) {
+    return res.status(200).json({ Sentiment: "Positive" });
+  }
+
+  if (sentiment === 0) {
+    return res.status(200).json({ Sentiment: "Neutral" });
+  }
+
+  if (sentiment === -1) {
+    return res.status(200).json({ Sentiment: "Negative" });
+  }
+};
+
+const getSentiment = (data) => {
+  console.log(data);
+
+  if (!data.trim()) {
+    return 0;
+  }
+
+  const lexed = aposToLexForm(data)
+    .toLowerCase()
+    .replace(/[^a-zA-Z\s]+/g, "");
+
+  const tokenized = tokenizer.tokenize(lexed);
+
+  const fixedSpelling = tokenized.map((word) => spellCorrector.correct(word));
+
+  const stopWordsRemoved = stopword.removeStopwords(fixedSpelling);
+
+  const analyzed = analyzer.getSentiment(stopWordsRemoved);
+  console.log(analyzed);
+  if (analyzed >= 1) return 1; // positive
+  if (analyzed === 0) return 0;
+  return -1;
+};
+
 module.exports = {
   homePage,
   signup,
@@ -172,4 +216,5 @@ module.exports = {
   deleteData,
   login,
   dashboard,
+  emotion,
 };
