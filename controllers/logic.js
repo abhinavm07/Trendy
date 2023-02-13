@@ -17,7 +17,7 @@ spellCorrector.loadDictionary();
 const analyzer = new SentimentAnalyzer("English", PorterStemmer, "afinn");
 
 const homePage = (req, res) => {
-  // throw new Error("Testing Express async error package");
+  // throw new Error("Testingg Express async error package");
 
   res.send("Welcome to the Home Page");
 
