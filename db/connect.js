@@ -7,7 +7,7 @@ const db = (url) => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })
-    .then(console.log("Database Has been Connected Sucessfully"))
+    .then(console.log("Database Has Been Connected Sucessfully"))
     .catch((err) => {
       console.log(err);
     });
