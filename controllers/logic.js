@@ -160,7 +160,7 @@ const deleteData = async (req, res) => {
   const { id: dataID } = req.params;
   const dataOut = await model.findByIdAndDelete({ _id: dataID });
   console.log(dataOut);
-  res.status(200).json({ msg: `model with the ID of : ${dataID} deleted !` });
+  res.status(200).json({ msg: `Model with the ID of : ${dataID} deleted !` });
 };
 
 const emotion = (req, res) => {
