@@ -1,5 +1,5 @@
-const express = require("express");
-const Router = express.Router();
+const express = require('express')
+const Router = express.Router()
 const {
   homePage,
   signup,
@@ -10,17 +10,17 @@ const {
   login,
   dashboard,
   emotion,
-} = require("../controllers/logic");
+} = require('../controllers/logic')
 
-Router.get("/homepage", homePage);
-Router.post("/signup", signup);
-Router.get("/allData", getStatic);
-Router.get("/add", addData);
-Router.get("/username", getUser);
-Router.delete("/:id", deleteData);
-Router.post("/login", login);
-Router.post("/api/sentiment", emotion);
-Router.route("/dashboard").get(dashboard);
+Router.get('/homepage', homePage)
+
+Router.get('/allData', getStatic)
+Router.get('/add', addData)
+Router.get('/username', getUser)
+Router.delete('/:id', deleteData)
+
+Router.post('/api/sentiment', emotion)
+Router.route('/dashboard').get(dashboard)
 
 // Router.use("/signup",express.static("./methods-public"));
-module.exports = Router;
+module.exports = Router

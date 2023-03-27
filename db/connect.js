@@ -1,16 +1,13 @@
-const mongoose = require("mongoose");
-mongoose.set("strictQuery", true);
+const mongoose = require('mongoose')
 
-const db = (url) => {
-  mongoose
-    .connect(url, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    })
-    .then(console.log("Database Has Been Connected Sucessfully"))
-    .catch((err) => {
-      console.log(err);
-    });
-};
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI)
+    console.log(`MongoDb connect: ${conn.connection.host}`.cyan.underline)
+  } catch (error) {
+    console.log(`Error: ${error.message}`.red.underline.bold)
+    process.exit(1)
+  }
+}
 
-module.exports = db;
+module.exports = connectDB
