@@ -6,6 +6,7 @@ import Home from './pages/Home'
 import Register from './pages/Register'
 import Header from './components/Header'
 import './app.css'
+import Page1 from './components/Page1'
 function App() {
   return (
     <>
@@ -15,6 +16,8 @@ function App() {
           <Routes>
             <Route path='/' element={<Login />} />
             <Route path='/dashboard' element={<Home />} />
+            <Route path='/homepage' element={<Page1 />} />
+
             <Route path='/register' element={<Register />} />
           </Routes>
         </div>

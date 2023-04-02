@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { FaSignInAlt } from 'react-icons/fa'
 import { toast } from 'react-toastify'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { login, reset } from '../features/auth/authSlice'
 import Spinner from '../components/Spinner'
@@ -25,7 +25,7 @@ function Login() {
     }
     //Redirect when logged in
     if (isSuccess || user) {
-      navigate('/')
+      navigate('/dashboard')
     }
     dispatch(reset())
   }, [dispatch, isError, isSuccess, message, navigate, user])
@@ -48,7 +48,7 @@ function Login() {
 
   return (
     <>
-      <section className='heading'>
+      {/* <section className='heading'>
         <h1>
           <FaSignInAlt /> Login
         </h1>
@@ -84,6 +84,52 @@ function Login() {
           </div>
         </form>
       </section>
+    </> */}
+
+      <div className='bg-grey-lighter min-h-screen flex flex-col'>
+        <div className='container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2'>
+          <div className='bg-white px-6 py-8 rounded shadow-md w-full'>
+            <h1 className='mb-8 text-3xl text-center text-black '>Sign In</h1>
+            <form onSubmit={onSubmit}>
+              <input
+                type='text'
+                className='block border border-grey-light w-full p-3 rounded mb-4'
+                name='email'
+                onChange={onChange}
+                value={email}
+                placeholder='Enter your email'
+              />
+
+              <input
+                type='password'
+                className='block border border-grey-light w-full p-3 rounded mb-4'
+                name='password'
+                onChange={onChange}
+                value={password}
+                placeholder='Enter your password'
+              />
+
+              <button
+                type='submit'
+                className='w-full text-center py-3 rounded bg-primary text-white hover:bg-green-dark focus:outline-none my-1'
+              >
+                Sign In
+              </button>
+            </form>
+          </div>
+
+          <div className='text-grey-dark mt-6'>
+            Don't have an account?{' '}
+            <Link
+              className='no-underline border-b border-blue text-blue'
+              to='/register'
+            >
+              Register
+            </Link>
+            .
+          </div>
+        </div>
+      </div>
     </>
   )
 }

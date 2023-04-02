@@ -44,8 +44,11 @@ const SearchBar = () => {
 
   return (
     <>
-      <div className='flex  items-center justify-center w-[1100px]'>
-        <form onSubmit={onSubmit}>
+      <div className=' w-full h-full'>
+        <div className='flex justify-center items-center h-20 w-full my-10'>
+          <SerachResult emotion={emotion} />
+        </div>
+        <form onSubmit={onSubmit} className='w-full'>
           <div className='form-group'>
             <input
               type='text'
@@ -57,12 +60,10 @@ const SearchBar = () => {
               className='flex mx-2 input input-bordered input-info w-full'
             />
           </div>
-          <button type='submit' className='btn btn-outline'>
+          <button type='submit' className='btn btn-outline '>
             Check Sentiment
           </button>
         </form>
-        {console.log(emotion)}
-        <SerachResult emotion={emotion} />
       </div>
     </>
   )
