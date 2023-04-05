@@ -4,6 +4,7 @@ const {
   registerUser,
   loginUser,
   getMe,
+  geolocation,
 } = require("../controllers/userController");
 const { getTwtData } = require("../controllers/userData");
 const { protect } = require("../middleware/authMiddleware");
