@@ -1,26 +1,26 @@
-const model = require('../model/trendySchema')
-const jwt = require('jsonwebtoken')
+const model = require("../model/trendySchema");
+const jwt = require("jsonwebtoken");
 
-const bcrypt = require('bcrypt')
+const bcrypt = require("bcrypt");
 
-const aposToLexForm = require('apos-to-lex-form')
-const { WordTokenizer, SentimentAnalyzer, PorterStemmer } = require('natural')
-const SpellCorrector = require('spelling-corrector')
-const stopword = require('stopword')
+const aposToLexForm = require("apos-to-lex-form");
+const { WordTokenizer, SentimentAnalyzer, PorterStemmer } = require("natural");
+const SpellCorrector = require("spelling-corrector");
+const stopword = require("stopword");
 
-const tokenizer = new WordTokenizer()
-const spellCorrector = new SpellCorrector()
-spellCorrector.loadDictionary()
+const tokenizer = new WordTokenizer();
+const spellCorrector = new SpellCorrector();
+spellCorrector.loadDictionary();
 
-const analyzer = new SentimentAnalyzer('English', PorterStemmer, 'afinn')
+const analyzer = new SentimentAnalyzer("English", PorterStemmer, "afinn");
 
 const homePage = (req, res) => {
   // throw new Error("Testingg Express async error package");
 
-  res.send('Welcome to the Home Page')
+  res.send("Welcome to the Home Page");
 
-  console.log('Home-Page')
-}
+  console.log("Home-Page");
+};
 
 // const signup = async (req, res) => {
 //   console.log('Welcome to signup')
@@ -44,7 +44,7 @@ const homePage = (req, res) => {
 
 //   const userToken = jwt.sign(
 //     { email: newUser.email, id: newUser._id },
-//     process.env.JWT_Secret,
+//     process..env.JWT_Secret,
 //     {
 //       expiresIn: '30d',
 //     }
@@ -75,7 +75,7 @@ const homePage = (req, res) => {
 
 //   const userToken = jwt.sign(
 //     { email: existingUser.email, id: existingUser._id },
-//     process.env.JWT_Secret,
+//     process..env.JWT_Secret,
 //     {
 //       expiresIn: '30d',
 //     }
@@ -86,7 +86,7 @@ const homePage = (req, res) => {
 //   // const id = new Date().getDate();
 
 //   // //the values passed as obj are the ones that are present in the jwt token for identification or modification
-//   // const userToken = jwt.sign({ id, username }, process.env.JWT_Secret, {
+//   // const userToken = jwt.sign({ id, username }, process..env.JWT_Secret, {
 //   //   expiresIn: "30d",
 //   // });
 //   // console.log({ username: username, password: password });
@@ -100,108 +100,110 @@ const dashboard = (req, res) => {
   //   console.log("Here");
   //   throw new CustomAPIError("No token available!", 401);
   // }
-  const jwtToken = Math.floor(Math.random() * 100)
+  const jwtToken = Math.floor(Math.random() * 100);
   res.status(200).json({
     msg: `Hello There ${req.user.username}`,
     tokenNum: `Your Token Number is ${jwtToken}`,
-  })
-  2
-}
+  });
+  2;
+};
 
 const getUser = async (req, res) => {
-  const { name, username, sort, fields } = req.query
-  const queryObj = {}
+  const { name, username, sort, fields } = req.query;
+  const queryObj = {};
 
   if (name) {
     //regex le chai name same to same nabhayeni edi model ma search gareko element xa bhanye dekhauxa Example: req.query ma "Abhi" aayo bhanye resunts ma Abhinab, abhii, abhinavv testo aauxa (just "abhi include bha hunu paryo"), option i ko mathlabh case insensative ho
     //mongoose docs herney confuse bhayema
-    queryObj.name = { $regex: name, $options: 'i' }
+    queryObj.name = { $regex: name, $options: "i" };
   }
 
   if (username) {
-    queryObj.username = username
+    queryObj.username = username;
   }
 
-  let results = model.find(queryObj)
+  let results = model.find(queryObj);
   if (sort) {
-    const sortLst = sort.split(',').join(' ')
-    results = results.sort(sortLst)
+    const sortLst = sort.split(",").join(" ");
+    results = results.sort(sortLst);
   } else {
-    results = results.sort('name')
-    console.log('From Else')
+    results = results.sort("name");
+    console.log("From Else");
   }
   if (fields) {
-    const fieldsLst = fields.split(',').join(' ')
+    const fieldsLst = fields.split(",").join(" ");
     //.select lets us select the needed model from the model base
-    results = results.select(fieldsLst)
+    results = results.select(fieldsLst);
   }
-  const page = Number(req.query.page) || 1
-  const limit = Number(req.query.limit) || 2
-  const skip = (page - 1) * limit
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 2;
+  const skip = (page - 1) * limit;
   //.skip skips the number of items from the database while limit limits the amount of model supplied to the frontend at a given time.  (read Mongoose docx if confused)
-  results = results.skip(skip).limit(limit)
-  const dataOut = await results
-  res.status(200).json({ msg: dataOut, hits: dataOut.length })
-}
+  results = results.skip(skip).limit(limit);
+  const dataOut = await results;
+  res.status(200).json({ msg: dataOut, hits: dataOut.length });
+};
 
 const getStatic = async (req, res) => {
-  const dataOut = await model.find({})
-  res.status(200).json({ msg: dataOut })
-}
+  const dataOut = await model.find({});
+  res.status(200).json({ msg: dataOut });
+};
 
 const addData = async (req, res) => {
-  const dataOut = await model.create(req.query)
-  res.status(200).json({ msg: 'Successful !' })
-}
+  const dataOut = await model.create(req.query);
+  res.status(200).json({ msg: "Successful !" });
+};
 
 const deleteData = async (req, res) => {
-  const { id: dataID } = req.params
-  const dataOut = await model.findByIdAndDelete({ _id: dataID })
-  console.log(dataOut)
-  res.status(200).json({ msg: `Model with the ID of : ${dataID} deleted !` })
-}
+  const { id: dataID } = req.params;
+  const dataOut = await model.findByIdAndDelete({ _id: dataID });
+  console.log(dataOut);
+  res.status(200).json({ msg: `Model with the ID of : ${dataID} deleted !` });
+};
 
 const emotion = (req, res) => {
-  const { data } = req.body
+  const { data } = req.body;
 
-  console.log('Hello')
+  console.log("Hello");
 
-  const sentiment = getSentiment(data)
+  const sentiment = getSentiment(data);
 
   if (sentiment === 1) {
-    return res.status(200).json({ Sentiment: 'Positive' })
+    return res.status(200).json({ Sentiment: "Positive" });
   }
 
   if (sentiment === 0) {
-    return res.status(200).json({ Sentiment: 'Neutral' })
+    return res.status(200).json({ Sentiment: "Neutral" });
   }
 
   if (sentiment === -1) {
-    return res.status(200).json({ Sentiment: 'Negative' })
+    return res.status(200).json({ Sentiment: "Negative" });
   }
-}
+};
 
 const getSentiment = (data) => {
   if (!data.trim()) {
-    return 0
+    return 0;
   }
 
   const lexed = aposToLexForm(data)
     .toLowerCase()
-    .replace(/[^a-zA-Z\s]+/g, '')
+    .replace(/[^a-zA-Z\s]+/g, "");
 
-  const tokenized = tokenizer.tokenize(lexed)
+  const tokenized = tokenizer.tokenize(lexed);
 
-  const fixedSpelling = tokenized.map((word) => spellCorrector.correct(word))
+  const fixedSpelling = tokenized.map((word) => spellCorrector.correct(word));
 
-  const stopWordsRemoved = stopword.removeStopwords(fixedSpelling)
+  const stopWordsRemoved = stopword.removeStopwords(fixedSpelling);
 
-  const analyzed = analyzer.getSentiment(stopWordsRemoved)
-  console.log(analyzed)
-  if (analyzed >= 1) return 1 // positive
-  if (analyzed === 0) return 0
-  return -1
-}
+  const analyzed = analyzer.getSentiment(stopWordsRemoved);
+  console.log(stopWordsRemoved);
+  console.log(analyzed);
+  if (analyzed > 0) return 1; // positive
+  if (analyzed === 0) return 0;
+  if (isNaN(analyzed)) return 0;
+  return -1;
+};
 
 module.exports = {
   homePage,
@@ -211,4 +213,4 @@ module.exports = {
   deleteData,
   dashboard,
   emotion,
-}
+};

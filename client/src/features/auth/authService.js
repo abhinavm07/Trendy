@@ -11,6 +11,13 @@ const register = async (userData) => {
   return response.data
 }
 
+//profile
+const getProfile = async (token) => {
+  const response = await axios.get(API_URL, token)
+
+  return response.data
+}
+
 //Login user
 const login = async (userData) => {
   const response = await axios.post(API_URL + 'login', userData)

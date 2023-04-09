@@ -1,5 +1,5 @@
-const express = require('express')
-const Router = express.Router()
+const express = require("express");
+const Router = express.Router();
 const {
   homePage,
   signup,
@@ -10,17 +10,32 @@ const {
   login,
   dashboard,
   emotion,
-} = require('../controllers/logic')
+} = require("../controllers/logic");
 
-Router.get('/homepage', homePage)
+const {
+  trendsV1,
+  nearMeT,
+  trendTweets,
+  trendsAvailable,
+} = require("../controllers/trends");
 
-Router.get('/allData', getStatic)
-Router.get('/add', addData)
-Router.get('/username', getUser)
-Router.delete('/:id', deleteData)
+const { getTwtData, searchTwt } = require("../controllers/userData");
 
-Router.post('/api/sentiment', emotion)
-Router.route('/dashboard').get(dashboard)
+Router.get("/homepage", homePage);
+
+Router.get("/allData", getStatic);
+Router.get("/add", addData);
+Router.get("/username", getUser);
+Router.delete("/:id", deleteData);
+
+Router.post("/sentiment", emotion);
+Router.route("/dashboard").get(dashboard);
+Router.post("/trend", trendsV1);
+Router.post("/nearme", nearMeT);
+Router.post("/trendTweets", trendTweets);
+Router.post("/twtUser", getTwtData);
+Router.post("/search", searchTwt);
+Router.get("/availableTrends", trendsAvailable);
 
 // Router.use("/signup",express.static("./methods-public"));
-module.exports = Router
+module.exports = Router;
