@@ -71,8 +71,7 @@ const loginUser = asyncHandler(async (req, res) => {
       token: genrateToken(user._id),
     });
   } else {
-    res.status(401);
-    throw new Error("Invalid Credentials");
+    return res.status(401).send('Invalid Credentials');
   }
 });
 

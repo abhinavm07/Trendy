@@ -44,7 +44,7 @@ const homePage = (req, res) => {
 
 //   const userToken = jwt.sign(
 //     { email: newUser.email, id: newUser._id },
-//     process.env.JWT_Secret,
+//     process..env.JWT_Secret,
 //     {
 //       expiresIn: '30d',
 //     }
@@ -75,7 +75,7 @@ const homePage = (req, res) => {
 
 //   const userToken = jwt.sign(
 //     { email: existingUser.email, id: existingUser._id },
-//     process.env.JWT_Secret,
+//     process..env.JWT_Secret,
 //     {
 //       expiresIn: '30d',
 //     }
@@ -86,7 +86,7 @@ const homePage = (req, res) => {
 //   // const id = new Date().getDate();
 
 //   // //the values passed as obj are the ones that are present in the jwt token for identification or modification
-//   // const userToken = jwt.sign({ id, username }, process.env.JWT_Secret, {
+//   // const userToken = jwt.sign({ id, username }, process..env.JWT_Secret, {
 //   //   expiresIn: "30d",
 //   // });
 //   // console.log({ username: username, password: password });

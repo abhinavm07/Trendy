@@ -41,8 +41,8 @@ const Page1 = () => {
         </form>
       </div>
 
-      <div className='grid grid-cols-2 mt-10 gap-6'>
-        <div>
+      <div className='mt-10 gap-6 flex'>
+        <div className='flex-col display'>
           <h1 className='font-bold my-10 text-4xl'>Trending Topics</h1>
           <span className='bg-slate-300 rounded-sm text-black p-5 m-2'>
             Elon
@@ -53,9 +53,28 @@ const Page1 = () => {
           <span className='bg-slate-300 rounded-sm text-black p-5 m-2'>
             Ipl
           </span>
+          <span className='bg-slate-300 rounded-sm text-black p-5 m-2'>
+            Elon
+          </span>
+          <span className='bg-slate-300 rounded-sm text-black p-5 m-2'>
+            Twitter
+          </span>
+          <span className='bg-slate-300 rounded-sm text-black p-5 m-2'>
+            Ipl
+          </span>
+          <span className='bg-slate-300 rounded-sm text-black p-5 m-2'>
+            Elon
+          </span>
+          <span className='bg-slate-300 rounded-sm text-black p-5 m-2'>
+            Twitter
+          </span>
+          <span className='bg-slate-300 rounded-sm text-black p-5 m-2'>
+            Ipl
+          </span>
         </div>
-
-        <img src={file} alt='file' />
+        <div className='flex'>
+          <img src={file} alt='file' />
+        </div>
       </div>
     </>
   )

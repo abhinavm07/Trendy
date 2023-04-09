@@ -61,17 +61,17 @@ const nearMeT = async (req, res, next) => {
     const trends = await client.v1.trendsClosest(lat, long);
     const woeid = trends[0]["woeid"];
 
-    const trendsOfNy = await v1Client.trendsByPlace(Number(woeid));
+    const trendsColec = await v1Client.trendsByPlace(Number(woeid));
     let trendColec = [];
     //   console.log("Here");
 
     try {
-      for (const { trends, created_at } of trendsOfNy) {
+      for (const { trends, created_at } of trendsColec) {
         for (const trend of trends) {
           // console.log("Trend : ", trend.name, "created at", created_at);
-          trendColec.push([trend.name, created_at]);
+          trendColec.push({ trend: trend.name, created_at: created_at });
         }
-        res.status(200).json({ trends_data: trendColec });
+        res.status(200).json(trendColec);
       }
     } catch (error) {
       console.log(error.message);
@@ -83,4 +83,39 @@ const nearMeT = async (req, res, next) => {
   }
 };
 
-module.exports = { trendsV1, nearMeT };
+const trendTweets = async (req, res) => {
+  let i = 0;
+  let tweetColec = [];
+  const { search } = req.body;
+  const recentTweets = await client.v2.tweetCountRecent(search);
+
+  const searchTweets = await client.v2.search(search, {
+    "media.fields": "url",
+  });
+
+  // Consume every possible tweet of jsTweets (until rate limit is hit)
+  for await (const tweet of searchTweets) {
+    i++;
+    if (i < 50) {
+      tweetColec.push({ tweetID: tweet.id, tweet: tweet.text });
+    } else if (i >= 50) {
+      console.log(i);
+      break;
+    }
+  }
+  console.log(i);
+  tweetColec.push([`recent tweet count : ${recentTweets.data[0].tweet_count}`]);
+  res.json(tweetColec);
+};
+
+const trendsAvailable = async (req, res) => {
+  let availableTrends = [];
+  const currentTrends = await client.v1.trendsAvailable();
+  let len = Object.keys(currentTrends).length;
+  for (const { name, country, woeid } of currentTrends) {
+    availableTrends.push({ name: name, country: country, woeid: woeid });
+  }
+  res.json(availableTrends);
+};
+
+module.exports = { trendsV1, nearMeT, trendTweets, trendsAvailable };

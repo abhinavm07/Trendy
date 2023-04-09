@@ -1,12 +1,7 @@
-import angry from '../assets/angry.svg'
-import happy from '../assets/happy.svg'
-import neutral from '../assets/neutral.svg'
-
-const SerachResult = ({ emotion }) => {
-  console.log(emotion)
+const SearchResult = ({ emotion }) => {
   return (
-    <div className='flex h-full '>
-      {emotion.Sentiment === 'Positive' ? (
+    <div className='flex h-full w-full '>
+      {emotion === 'Positive' ? (
         <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'>
           <defs>
             <style>{'.cls-2{fill:#273941}.cls-5{fill:#f6fafd}'}</style>
@@ -51,7 +46,7 @@ const SerachResult = ({ emotion }) => {
             />
           </g>
         </svg>
-      ) : emotion.Sentiment === 'Neutral' ? (
+      ) : emotion === 'Neutral' ? (
         <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'>
           <defs>
             <style>
@@ -101,7 +96,7 @@ const SerachResult = ({ emotion }) => {
             />
           </g>
         </svg>
-      ) : emotion.Sentiment === 'Negative' ? (
+      ) : emotion === 'Negative' ? (
         <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'>
           <defs>
             <style
@@ -176,4 +171,4 @@ const SerachResult = ({ emotion }) => {
   )
 }
 
-export default SerachResult
+export default SearchResult

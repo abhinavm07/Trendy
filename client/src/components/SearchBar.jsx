@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { emotions, reset } from '../features/sentiment/sentimentSlice'
 import Spinner from '../components/Spinner'
-import SerachResult from './SerachResult'
+import SearchResult from './SearchResult.jsx'
 const SearchBar = () => {
   const [formData, setFormData] = useState({
     data: '',
@@ -13,9 +13,7 @@ const SearchBar = () => {
 
   const { data } = formData
 
-  console.log(formData)
   const dispatch = useDispatch()
-  const navigate = useNavigate()
   const { emotion, isLoading, isError, message } = useSelector(
     (state) => state.sentiment
   )
@@ -46,7 +44,7 @@ const SearchBar = () => {
     <>
       <div className=' w-full h-full'>
         <div className='flex justify-center items-center h-20 w-full my-10'>
-          <SerachResult emotion={emotion} />
+          <SearchResult emotion={emotion.Sentiment} />
         </div>
         <form onSubmit={onSubmit} className='w-full'>
           <div className='form-group'>
@@ -64,6 +62,12 @@ const SearchBar = () => {
             Check Sentiment
           </button>
         </form>
+        <div className='sentiment-analysis-result'>
+          <div key={1}>
+            {' '}
+            <span>Sentiment:</span> {emotion.Sentiment}
+          </div>
+        </div>
       </div>
     </>
   )
