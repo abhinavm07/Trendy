@@ -1,76 +1,41 @@
-import { useState, useEffect } from 'react'
-import { FaSignInAlt } from 'react-icons/fa'
-import { toast } from 'react-toastify'
-import { useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { emotions, reset } from '../features/sentiment/sentimentSlice'
-import Spinner from '../components/Spinner'
-import SearchResult from './SearchResult.jsx'
-const SearchBar = () => {
-  const [formData, setFormData] = useState({
-    data: '',
-  })
+export default function SearchBar({
+                                      onSubmit,
+                                      value,
+                                      onChange,
+                                      name,
+                                      id,
+                                      placeholder,
+                                      disabled,
+                                      type,
+                                      icon,
+                                      buttonIcon
+                                  }) {
+    return (
+        <>
+            <form onSubmit={onSubmit} className='w-full'>
+                <div className='form-group'>
+                    <div className="input-group">
+                        <div className="input-group-prepend">
+                            <span className="icon-text-input" id="basic-addon1">{icon}</span>
+                        </div>
+                        <input
+                            type={type}
+                            placeholder={placeholder}
+                            name={name}
+                            id={id}
+                            value={value}
+                            onChange={onChange}
+                            className='input  input-info'
+                        />
+                        <div className='input-group-append'>
+                            <button type='submit' className='btn searchButton' disabled={disabled}>
+                                {buttonIcon}
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-  const { data } = formData
-
-  const dispatch = useDispatch()
-  const { emotion, isLoading, isError, message } = useSelector(
-    (state) => state.sentiment
-  )
-  useEffect(() => {
-    if (isError) {
-      toast.error(message)
-    }
-
-    dispatch(reset())
-  }, [dispatch, isError, message])
-
-  const onSubmit = (e) => {
-    e.preventDefault()
-    const emotionData = { data }
-    dispatch(emotions(emotionData))
-  }
-  const onChange = (e) => {
-    setFormData((prevstate) => ({
-      ...prevstate,
-      [e.target.name]: e.target.value,
-    }))
-  }
-  if (isLoading) {
-    return <Spinner />
-  }
-
-  return (
-    <>
-      <div className=' w-full h-full'>
-        <div className='flex justify-center items-center h-20 w-full my-10'>
-          <SearchResult emotion={emotion.Sentiment} />
-        </div>
-        <form onSubmit={onSubmit} className='w-full'>
-          <div className='form-group'>
-            <input
-              type='text'
-              placeholder='Search here'
-              name='data'
-              id='data'
-              value={data}
-              onChange={onChange}
-              className='flex mx-2 input input-bordered input-info w-full'
-            />
-          </div>
-          <button type='submit' className='btn btn-outline '>
-            Check Sentiment
-          </button>
-        </form>
-        <div className='sentiment-analysis-result'>
-          <div key={1}>
-            {' '}
-            <span>Sentiment:</span> {emotion.Sentiment}
-          </div>
-        </div>
-      </div>
-    </>
-  )
+            </form>
+        </>
+    );
 }
-
-export default SearchBar

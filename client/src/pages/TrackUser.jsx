@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 
 import { toast } from 'react-toastify'
 import file from '../assets/file.png'
+import SearchBar from "../components/SearchBar.jsx";
+import {IoSearch} from "react-icons/all.js";
 const Page1 = () => {
   const [formData, setFormData] = useState({
     data: '',
@@ -22,23 +24,19 @@ const Page1 = () => {
   }
   return (
     <>
-      <div className=' w-full h-full'>
-        <form onSubmit={onSubmit} className='w-full'>
-          <div className='form-group'>
-            <input
-              type='text'
-              placeholder='Search here'
-              name='data'
-              id='data'
-              value={data}
-              onChange={onChange}
-              className='flex mx-2 input input-bordered input-info w-full'
+      <div className=' sidecontainer'>
+            <SearchBar
+                onSubmit={onSubmit}
+                value={data}
+                onChange={onChange}
+                name='data'
+                id='data'
+                placeholder='Search here'
+                disabled={!data}
+                type='text'
+                icon='@'
+                buttonIcon={<IoSearch/>}
             />
-          </div>
-          <button type='submit' className='btn btn-outline '>
-            Search
-          </button>
-        </form>
       </div>
 
       <div className='mt-10 gap-6 flex'>

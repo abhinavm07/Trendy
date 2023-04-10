@@ -4,8 +4,12 @@ import {twtUsers, reset} from '../features/tweetOfUser/tweetOfUserSlice'
 import Spinner from '../components/Spinner'
 import {toast} from 'react-toastify'
 import SearchResult from '../components/SearchResult.jsx'
+import {IoSearch} from "react-icons/all.js";
+import SearchBar from "../components/SearchBar.jsx";
+import {Tooltip} from 'react-tooltip'
 
-const User = () => {
+
+const UserAnalytics = () => {
     const [formData, setFormData] = useState({
         twtUsername: '',
     })
@@ -45,23 +49,56 @@ const User = () => {
 
     return (
         <>
-            <div className='w-full h-full'>
-                <form onSubmit={onSubmit} className='w-full'>
-                    <div className='form-group'>
-                        <input
-                            type='text'
-                            placeholder='Search here'
-                            name='twtUsername'
-                            id='twtUsername'
-                            value={twtUsername}
-                            onChange={onChange}
-                            className='flex mx-2 input input-bordered input-info w-full'
-                        />
+            <div className='sidecontainer'>
+                <SearchBar
+                    onSubmit={onSubmit}
+                    value={twtUsername}
+                    onChange={onChange}
+                    name='twtUsername'
+                    id='twtUsername'
+                    placeholder='Search here'
+                    disabled={!twtUsername}
+                    type='text'
+                    icon='@'
+                    buttonIcon={<IoSearch/>}
+                />
+                {twtUser?.userData && <div className='meta-user-details'>
+                    <div className='grid grid-cols-3 gap-4 mt-2'>
+                        <div className='col-span-1'>
+                            <div className='flex flex-col meta-user-info'>
+                                Followers
+                            </div>
+                        </div>
+                        <div className='col-span-1'>
+                            <div className='flex flex-col meta-user-info'>
+                                Following
+                            </div>
+                        </div>
+                        <div className='col-span-1'>
+                            <div className='flex flex-col meta-user-info'>
+                                Tweets
+                            </div>
+                        </div>
                     </div>
-                    <button type='submit' className='btn btn-outline ' disabled={!twtUsername}>
-                        Search UserName
-                    </button>
-                </form>
+                    <div className='grid grid-cols-3 gap-4 mt-2'>
+                        <div className='col-span-1'>
+                            <div className='flex flex-col'>
+                                {twtUser?.userData?.data?.public_metrics?.followers_count}
+                            </div>
+                        </div>
+                        <div className='col-span-1'>
+                            <div className='flex flex-col'>
+                                {twtUser?.userData?.data?.public_metrics?.following_count}
+                            </div>
+                        </div>
+                        <div className='col-span-1'>
+                            <div className='flex flex-col'>
+                                {twtUser?.userData?.data?.public_metrics?.tweet_count}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
             </div>
             {twtUser?.userData && <div className='flex flex-col'>
                 <div>
@@ -72,69 +109,24 @@ const User = () => {
                     <br/>
                     <div className='user-tweet-details'>
                         <div className='flex '>
-                            {/* start of  table */}
-                            <div className='overflow-x-auto mx-2 '>
-                                <table className='table table-compact w-full'>
-                                    <thead>
-                                    <tr>
-                                        <th>SN</th>
-                                        <th>User Stats</th>
-                                        <th>Count</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <th>1</th>
-                                        <td>Followers</td>
-                                        <td>
-                                            {twtUser?.userData?.data?.public_metrics?.followers_count}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>2</th>
-                                        <td>Following</td>
-                                        <td>
-                                            {twtUser?.userData?.data?.public_metrics?.following_count}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>3</th>
-                                        <td>Tweets</td>
-                                        <td>
-                                            {twtUser?.userData?.data?.public_metrics?.tweet_count}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>4</th>
-                                        <td>Replies</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <th>5</th>
-                                        <td>Likes</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <th>6</th>
-                                        <td>Account Status</td>
-                                        <td></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            {/* end of  table */}
                         </div>
                         <div className='recent-tweets'>
                             <div className='justify-center'>
                                 <div className='carousel carousel-vertical rounded-box all-tweet-list'>
-                                    {twtUser?.twtData?.map((data) => (
-                                        <div className='carousel-item recent-tweet' key={data.id}>
+                                    {twtUser?.twtData?.map((data, index) => (
+                                        <div className='carousel-item recent-tweet' key={index}>
                                             <div className={getClassName(data.sentiment)}>
                                                 <div className='warning-banner'>
-                                                    <div className='flex justify-center items-center h-10 w-full my-10'>
+                                                    <div
+                                                        className='flex justify-center items-center h-10 w-full my-10'
+                                                        id={index + "_tweet-sentiment"}
+                                                    >
                                                         <SearchResult emotion={data.sentiment} key={data.id}/>
                                                     </div>
                                                 </div>
+                                                <Tooltip anchorId={index + '_tweet-sentiment'}
+                                                         content={'Sentiment of this tweet is ' + data.sentiment}
+                                                />
                                                 <div className='avatar-username'>
                                                     <div className='avatar'>
                                                         <img
@@ -161,9 +153,10 @@ const User = () => {
                     </div>
                 </div>
 
-            </div>}
+            </div>
+            }
         </>
     )
 }
 
-export default User
+export default UserAnalytics

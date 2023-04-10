@@ -1,9 +1,9 @@
-import SearchBar from '../components/SearchBar'
+import SentimentSearchBar from './SentimentSearchBar.jsx'
 
 function Home() {
   return (
     <>
-      <SearchBar />
+      <SentimentSearchBar />
     </>
   )
 }

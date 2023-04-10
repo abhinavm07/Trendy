@@ -410,7 +410,6 @@ footer {
     align-items: center;
     justify-content: center;
     height: 70vh;
-    margin-top: 8%;
 }
 
 .image-left {
@@ -430,7 +429,6 @@ footer {
 }
 
 .recent-tweets {
-    padding: 10px;
 }
 
 .recent-tweet {
@@ -438,7 +436,6 @@ footer {
 }
 
 .all-tweet-list {
-    padding: 10px;
     max-height: 66vh;
 }
 
@@ -473,6 +470,7 @@ footer {
     padding: 20px;
     width: 100%;
     text-align: left;
+    margin-top: 10px;
 }
 
 .sentiment-Negative {
@@ -491,10 +489,43 @@ footer {
 }
 
 .warning-banner {
-    margin-top: -9%;
+    margin-top: -78px;
     position: inherit;
 }
 
 .sentiment-analysis-result{
     display:flex;
+}
+.drawer-content {
+    width: 100%;
+    padding: 1rem;
+}
+
+.meta-user-details {
+    margin-top:15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+}
+
+.meta-user-info{
+    font-weight: bold;
+}
+
+.icon-text-input{
+    height: 83%;
+}
+
+.searchButton{
+    border-radius: unset !important;
+}
+.form-group input {
+    border-radius: unset;
+}
+
+.disabledLink {
+    pointer-events: none;
+    cursor: pointer;
+    background: #fcf8f7;
 }

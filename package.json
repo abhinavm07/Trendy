@@ -33,6 +33,7 @@
     "natural": "^6.2.0",
     "needle": "^3.2.0",
     "nodemon": "^2.0.22",
+    "react-tooltip": "^5.10.5",
     "spelling-corrector": "^3.0.0",
     "stopword": "^2.0.8",
     "twitter": "^1.7.1",

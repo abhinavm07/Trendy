@@ -1,45 +1,67 @@
-import { FaHamburger } from 'react-icons/fa'
-import { IoSettingsOutline } from 'react-icons/io5'
+import {FaHamburger} from 'react-icons/fa'
+import {IoGitCompare, IoHappy, IoHelp, IoSettingsOutline} from 'react-icons/io5'
+import {Link, Route, Routes} from "react-router-dom";
+import LoginRegister from "../pages/LoginRegister.jsx";
+import PrivateRoute from "./PrivateRoute.jsx";
+import DashBoard from "../pages/Dashboard.jsx";
+import TrackUser from "../pages/TrackUser.jsx";
+import Home from "../pages/Home.jsx";
+import ComparingUsers from "../pages/ComparingUsers.jsx";
+import UserAnalytics from "../pages/UserAnalytics.jsx";
+import UnderConstruction from "./UnderConstruction.jsx";
+import {useSelector} from "react-redux";
+import {ImUser, IoMdAnalytics} from "react-icons/all.js";
+import Navigation from "./Navigation.jsx";
+import Router from "./Router.jsx";
+
 const Drawer = () => {
-  return (
-    <div className='drawer drawer-mobile'>
-      <input id='my-drawer-2' type='checkbox' className='drawer-toggle' />
-      <div className='drawer-content flex flex-col items-center justify-center'>
-        <label
-          htmlFor='my-drawer-2'
-          className='btn btn-primary drawer-button lg:hidden'
-        >
-          <FaHamburger />
-        </label>
-      </div>
-      <div className='drawer-side'>
-        <label htmlFor='my-drawer-2' className='drawer-overlay'></label>
-        <ul className='menu p-4 w-80 bg-base-100 text-base-content'>
-          {/* TODO: "Add Font awesomes"  */}
-          <li>
-            <a href='/analytics'>User Analytics</a>
-          </li>
-          <li>
-            <a href='/trackuser'>Track User</a>
-          </li>
-          <li>
-            <a href='/comparision'>Comparision</a>
-          </li>
-          <li>
-            <a href='/sentiment'>Sentiment Analysis</a>
-          </li>
-          <li>
-            <a href='/support'>Support</a>
-          </li>
-          <li>
-            <a href='/setting'>
-              <IoSettingsOutline /> Setting
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  )
+    const {user} = useSelector((state) => state.auth)
+    const sideBar = [
+        {
+            name: 'User Analytics',
+            icon: <IoMdAnalytics/>,
+            path: '/analytics'
+        },
+        {
+            name: 'Track User',
+            icon: <ImUser/>,
+            path: '/trackuser'
+        },
+        {
+            name: 'Comparision',
+            icon: <IoGitCompare/>,
+            path: '/comparision'
+        },
+        {
+            name: 'Sentiment Analysis',
+            icon: <IoHappy/>,
+            path: '/sentiment'
+        },
+        {
+            name: 'Support',
+            icon: <IoHelp/>,
+            path: '/support',
+            disabled: true
+        },
+        {
+            name: 'Setting',
+            icon: <IoSettingsOutline/>,
+            path: '/setting',
+            disabled: true
+        }
+    ];
+
+    return (
+        <div className='drawer drawer-mobile flex'>
+            {user && <div className='drawer-side'>
+                <label htmlFor='my-drawer-2' className='drawer-overlay'></label>
+                <Navigation items={sideBar}/>
+            </div>}
+            <div className='drawer-content'>
+                <Router/>
+            </div>
+        </div>
+    )
 }
 
 export default Drawer
