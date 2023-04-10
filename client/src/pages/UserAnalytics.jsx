@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from 'react-redux'
 import {twtUsers, reset} from '../features/tweetOfUser/tweetOfUserSlice'
 import Spinner from '../components/Spinner'
 import {toast} from 'react-toastify'
-import SearchResult from '../components/SearchResult.jsx'
+import SentimentSearchResults from '../components/SentimentSearchResults.jsx'
 import {IoSearch} from "react-icons/all.js";
 import SearchBar from "../components/SearchBar.jsx";
 import {Tooltip} from 'react-tooltip'
@@ -121,7 +121,7 @@ const UserAnalytics = () => {
                                                         className='flex justify-center items-center h-10 w-full my-10'
                                                         id={index + "_tweet-sentiment"}
                                                     >
-                                                        <SearchResult emotion={data.sentiment} key={data.id}/>
+                                                        <SentimentSearchResults emotion={data.sentiment} key={data.id}/>
                                                     </div>
                                                 </div>
                                                 <Tooltip anchorId={index + '_tweet-sentiment'}

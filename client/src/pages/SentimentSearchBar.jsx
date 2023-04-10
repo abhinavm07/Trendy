@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { emotions, reset } from '../features/sentiment/sentimentSlice.js'
 import Spinner from '../components/Spinner.jsx'
-import SearchResult from '../components/SearchResult.jsx'
+import SentimentSearchResults from '../components/SentimentSearchResults.jsx'
 import SearchBar from "../components/SearchBar.jsx";
 import {IoSearch} from "react-icons/all.js";
 import {IoHappy} from "react-icons/io5";
@@ -64,7 +64,7 @@ const SentimentSearchBar = () => {
             <span>Sentiment:</span> {emotion.Sentiment}
           </div>
           <div className='flex justify-center items-center h-20 w-full my-10'>
-            <SearchResult emotion={emotion.Sentiment} />
+            <SentimentSearchResults emotion={emotion.Sentiment} />
           </div>
         </div>
       </div>

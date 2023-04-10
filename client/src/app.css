@@ -49,7 +49,6 @@ h3 {
     align-items: center;
     padding: 20px 0;
     border-bottom: 1px solid #e6e6e6;
-    margin-bottom: 60px;
 }
 
 .header ul {
@@ -410,13 +409,14 @@ footer {
     align-items: center;
     justify-content: center;
     height: 70vh;
+    margin-top: 20px;
 }
 
 .image-left {
     width: 78%;
     height: 100%;
-    background-image: url("assets/image.jpeg");
-    background-size: cover;
+    background-image: url("assets/background.png");
+    background-size: contain;
     background-repeat: no-repeat;
 }
 
@@ -499,6 +499,7 @@ footer {
 .drawer-content {
     width: 100%;
     padding: 1rem;
+    overflow: hidden;
 }
 
 .meta-user-details {
@@ -528,4 +529,66 @@ footer {
     pointer-events: none;
     cursor: pointer;
     background: #fcf8f7;
+}
+
+.individualTrends{
+    color: #007aff;
+    padding:5px;
+    width:25%;
+    float: left;
+}
+
+.individualTrends:hover{
+    text-decoration: underline;
+}
+
+/*
+add new tab icon when hover to .individualTrends
+*/
+
+.individualTrends:hover::after {
+    content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
+    font-size: 10px;
+    font-weight: bold;
+    margin-left:5px;
+    color: #007aff;
+}
+
+.trendbox {
+    height: 100%;
+    overflow: auto;
+}
+
+.drawer-side {
+    border-right: 1px solid #e6e6e6;
+    border-top: 1px solid #e6e6e6;
+}
+
+.pageTitle{
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    text-transform: uppercase;
+}
+
+.activePath{
+    background: #e6e6e6;
+}
+
+.containerCustom{
+    max-width: unset !important;
+    padding: unset !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+}
+
+.drawer {
+    height: 100% !important;
+}
+
+.tweetbox-title {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ccc;
 }

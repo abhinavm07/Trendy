@@ -204,3 +204,18 @@ const getSentiment = (data) => {
 };
 
 // ehBhagwanV2();
+
+const tori = async () => {
+  const tweetOfID = await client.v2.singleTweet("1641769150698905601", {
+    "tweet.fields": "context_annotations",
+  });
+  console.log(tweetOfID);
+
+  // const data = tweetOfID.data.text;
+};
+
+tori();
+
+// , {
+//     "tweet.fields": "context_annotations",
+//   }

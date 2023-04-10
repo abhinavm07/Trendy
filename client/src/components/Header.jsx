@@ -2,6 +2,7 @@ import {FaSignInAlt, FaSignOutAlt, FaUser} from 'react-icons/fa'
 import {Link, useNavigate} from 'react-router-dom'
 import {useDispatch, useSelector} from 'react-redux'
 import {logout, reset} from '../features/auth/authSlice'
+import {IoHome} from "react-icons/io5";
 
 function Header() {
     const navigate = useNavigate()
@@ -17,7 +18,7 @@ function Header() {
     return (
         <header className='header'>
             <div className='logo'>
-                <Link to='/dashboard'>Home</Link>
+                {user ? <Link to='/dashboard'><IoHome/></Link> : 'Trendy'}
             </div>
             <ul>
                 {user ? (
@@ -28,18 +29,18 @@ function Header() {
                     </li>
                 ) : (
                     <>
-                        <li>
-                            <Link to='/login'>
-                                <FaSignInAlt/>
-                                Login
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to='/register'>
-                                <FaUser/>
-                                Register
-                            </Link>
-                        </li>
+                        {/*<li>*/}
+                        {/*    <Link to='/login'>*/}
+                        {/*        <FaSignInAlt/>*/}
+                        {/*        Login*/}
+                        {/*    </Link>*/}
+                        {/*</li>*/}
+                        {/*<li>*/}
+                        {/*    <Link to='/register'>*/}
+                        {/*        <FaUser/>*/}
+                        {/*        Register*/}
+                        {/*    </Link>*/}
+                        {/*</li>*/}
                     </>
                 )}
             </ul>

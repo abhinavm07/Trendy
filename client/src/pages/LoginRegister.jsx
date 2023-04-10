@@ -9,7 +9,7 @@ export default function LoginRegister () {
 
 return (
     <>
-        <div className="backdoor-container rounded shadow-md">
+        <div className="backdoor-container rounded">
             <div className="image-left">
             </div>
             <div className="form-right">

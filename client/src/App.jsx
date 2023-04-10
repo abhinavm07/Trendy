@@ -11,7 +11,7 @@ function App() {
     return (
         <>
             <Router>
-                <div className='container'>
+                <div className='container containerCustom'>
                     <Header/>
                     <Drawer/>
                 </div>

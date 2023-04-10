@@ -31,11 +31,11 @@ Router.delete("/:id", deleteData);
 Router.post("/sentiment", emotion);
 Router.route("/dashboard").get(dashboard);
 Router.post("/trend", trendsV1);
-Router.post("/nearme", nearMeT);
+Router.post("/nearMe", nearMeT);
 Router.post("/trendTweets", trendTweets);
 Router.post("/twtUser", getTwtData);
 Router.post("/search", searchTwt);
-Router.get("/availableTrends", trendsAvailable);
+Router.get("/availableCountry", trendsAvailable);
 
 // Router.use("/signup",express.static("./methods-public"));
 module.exports = Router;
