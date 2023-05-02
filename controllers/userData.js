@@ -1,10 +1,10 @@
 const { TwitterApi } = require("twitter-api-v2");
 require("dotenv/config");
 
-// const apiKey = process.env.API_KEY;
-// const apiSecret = process.env.API_KEY_SECRET;
-// const apiTokenkey = process.env.API_TOKEN;
-// const apiTokenSecret = process.env.API_TOKEN_SECRET;
+const apiKey = process.env.API_KEY;
+const apiSecret = process.env.API_KEY_SECRET;
+const apiTokenkey = process.env.API_TOKEN;
+const apiTokenSecret = process.env.API_TOKEN_SECRET;
 
 const aposToLexForm = require("apos-to-lex-form");
 const { WordTokenizer, SentimentAnalyzer, PorterStemmer } = require("natural");
@@ -18,6 +18,7 @@ spellCorrector.loadDictionary();
 const analyzer = new SentimentAnalyzer("English", PorterStemmer, "afinn");
 
 const client = new TwitterApi(`${process.env.BEARER_KEY}`);
+
 let contextByID = [];
 
 const getTwtData = async (req, res) => {
@@ -36,7 +37,6 @@ const getTwtData = async (req, res) => {
     });
     if (userTweets) {
       let twtData = userTweets["_realData"]["data"];
-      // console.log(twtData);
       for (const twt of twtData) {
         const id = twt["id"];
         const twtSentiment = await tweetsSentiment(twt["text"]);
@@ -83,6 +83,8 @@ const searchTwt = async (req, res) => {
   const searchTweets = await client.v2.search(search, {
     "media.fields": "url",
   });
+
+  // Consume every possible tweet of jsTweets (until rate limit is hit)
   for await (const tweet of searchTweets) {
     i++;
     if (i < 20) {
@@ -101,14 +103,17 @@ const tweetsSentiment = async (data) => {
   let sentimentRemark;
 
   if (sentiment === 1) {
+    sentimentRemark = "Positive";
     return "Positive";
   }
 
   if (sentiment === 0) {
+    sentimentRemark = "Neutral";
     return "Neutral";
   }
 
   if (sentiment === -1) {
+    sentimentRemark = "Negative";
     return "Negative";
   }
 };
@@ -129,15 +134,11 @@ const getSentiment = (data) => {
   const stopWordsRemoved = stopword.removeStopwords(fixedSpelling);
 
   const analyzed = analyzer.getSentiment(stopWordsRemoved);
-  // console.log(stopWordsRemoved);
-  // console.log(analyzed);
   if (analyzed > 0) return 1; // positive
   if (analyzed === 0) return 0;
   if (isNaN(analyzed)) return 0;
   return -1;
 };
-
-//
 
 const tweetContext = (tweets, id) => {
   tweets.forEach((element) => {
@@ -151,14 +152,12 @@ const tweetContext = (tweets, id) => {
   });
   return contextByID;
 };
-let contextVols = {};
+
 const contextVol = (annots) => {
-  contextVols = {};
-  console.log(contextVols);
+  let contextVols = {};
   annots.forEach((element) => {
     contextVols[element] = (contextVols[element] || 0) + 1;
   });
-  console.log(contextVols);
   return contextVols;
 };
 

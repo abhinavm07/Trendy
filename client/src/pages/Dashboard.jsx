@@ -11,8 +11,11 @@ import {
 import {toast} from "react-toastify";
 import Spinner from "../components/Spinner.jsx";
 import SearchBar from "../components/SearchBar.jsx";
-import {IoSearch, CiTwitter} from "react-icons/all.js";
+import {IoSearch, CiTwitter, IoOpen} from "react-icons/all.js";
 import {Charts} from "../components/Charts.jsx";
+import {formatNumber} from "../features/helpers.js";
+import SentimentSearchResults from "../components/SentimentSearchResults.jsx";
+import ActionBox from "../components/ActionBox.jsx";
 
 
 const DashBoard = () => {
@@ -25,12 +28,11 @@ const DashBoard = () => {
         long: null,
     });
 
-    const [countryName, setCountryName] = useState('')
+    const [countryName, setCountryName] = useState('Worldwide')
 
     const [formData, setFormData] = useState({
         searchValue: '',
     })
-
 
     let selectedCountry = null;
 
@@ -46,6 +48,10 @@ const DashBoard = () => {
         state.nearMeTrends
     )
 
+    const [actionBoxSettings, setActionBoxSettings] = useState({
+        visible: false
+    });
+
     function changeCountry(e) {
         selectedCountry = e.target.value;
         dispatch(getTrends(selectedCountry));
@@ -54,7 +60,9 @@ const DashBoard = () => {
 
     useEffect(() => {
         if (isErrorCountry || isErrorTrends || isErrorNear) {
-            toast.error(messageTrends || messageCountry || messageNear)
+            toast.error('Something went wrong. If this continues please refresh the page.', {
+                toastId: 'error_trends',
+            })
         }
         dispatch(resetCountries())
         dispatch(resetTrends())
@@ -66,13 +74,16 @@ const DashBoard = () => {
         if (!user) {
             navigate('/login');
         }
+        dispatch(getTrends("1"));
         getLocation();
         checkCountry();
     }, []);
 
 
     useEffect(() => {
-        dispatch(getNearMeT(geoPosition))
+        if (geoPosition.lat && geoPosition.long) {
+            dispatch(getNearMeT(geoPosition))
+        }
     }, [geoPosition.long, geoPosition.lat])
 
 
@@ -107,6 +118,42 @@ const DashBoard = () => {
         );
     }
 
+    async function fetchSentiment(trend) {
+        const trendSentiment = await fetch(`/api/routes/fetchSentiment/${trend}`, {
+            method: 'GET',
+        })
+        return trendSentiment;
+    }
+
+    function openTrend(trend, parent) {
+        const settings = {
+            visible: true,
+            parentId: parent,
+            position: 'left',
+            onOpen: async () => await fetchSentiment(trend.trend)
+            ,
+            onClose: () => {
+                setActionBoxSettings({
+                    visible: false
+                })
+            },
+            extraOptions: {
+                'open_trend': {
+                    action: () => {
+                        window.open(
+                            trend.tweet_url,
+                            '_blank'
+                        );
+                    },
+                    label: 'Open Trend',
+                    icon: <IoOpen/>,
+                }
+            }
+        };
+        setActionBoxSettings(settings);
+    }
+
+
     //function to get current latitude3 and longitude
     function getLocation() {
         if (navigator.geolocation) {
@@ -131,15 +178,24 @@ const DashBoard = () => {
         label: 'Trending',
     };
 
+    const extraOptions = {
+        width: '100px',
+        height: '40%',
+        canExport: true,
+        canShare: true,
+        canSave: true,
+    }
+
     return (
         <div className='sidecontainer'>
+            {actionBoxSettings?.visible && <ActionBox settings={actionBoxSettings}/>}
             <SearchBar
                 onSubmit={takeToTwitter}
                 value={formData.searchValue}
                 onChange={onChange}
                 name='searchValue'
                 id='tweetSearch'
-                placeholder='Search Tweets'
+                placeholder='Search on Twitter'
                 disabled={!formData.searchValue}
                 type='text'
                 icon={<CiTwitter/>}
@@ -156,25 +212,44 @@ const DashBoard = () => {
                 </select>
             </div>
             {
-                (isLoadingTrends || isLoadingNear) && <Spinner/>
+                ///if isLoadingTrends or isLoadingNear runs for more than 30 seconds, close spinner and show error
+                (
+                    (isLoadingTrends || isLoadingNear || isLoadingCountry) &&
+                    <Spinner waitFor={30} error={trends?.message || nearTrends?.message} forceRefresh/>
+                )
             }
-            {trends && !isLoadingTrends && !isErrorTrends && countryName &&
-                <div className='tweetbox clear-both mt-5 trendbox'>
-                    <div className='tweetbox-title'>Trending in {countryName}</div>
-                    <Charts chartOptions={locationTrendOption} data={trends}/>
-                </div>}
-            {nearTrends && !isLoadingNear && !isErrorNear && !nearTrends?.message &&
-                <div className='tweetbox clear-both mt-5 trendbox'>
-                    <>
-                        <div className='tweetbox-title'>Trending in your area</div>
-                        {Object.values(nearTrends).map((nearMe, index) => (
-                            (nearMe?.trend && <div key={index} className='individualTrends'>
-                                <a href={nearMe.tweet_url}
-                                   target='_blank'>{nearMe['trend']}</a>
-                            </div>)
-                        ))}
-                    </>
-                </div>}
+            <div className='d-flex flex-row trendboxes justify-content-between clear-both'>
+                <div className='tweetbox mt-5 trendbox'>
+                    {(trends && !isLoadingTrends && !isErrorTrends && countryName) ?
+                        (<>
+                            <div className='tweetbox-title'>Trending in {countryName}</div>
+                            <Charts chartOptions={locationTrendOption} data={trends} extraOptions={extraOptions}/></>)
+                        :
+                        (
+                            <div className=''>Please select a country to see the trends there.</div>
+                        )
+                    }
+                </div>
+                <div></div>
+                {nearTrends && !isLoadingNear && !isErrorNear && !nearTrends?.message &&
+                    <div className='tweetbox mt-5 trendbox sidetrend'>
+                        <>
+                            <div className='tweetbox-title'>Around You</div>
+                            {Object.values(nearTrends).map((nearMe, index) => (
+                                (nearMe?.trend &&
+                                    <div key={index}>
+                                        <div key={index} className='individualTrends flex'
+                                             onClick={() => openTrend(nearMe, `side_trend_${index}`)}
+                                             id={'side_trend_' + index}>
+                                            <a href='#'
+                                            >{nearMe['trend']}<span
+                                                className='tweetVolume'> {formatNumber(nearMe.volume)} Tweets</span></a>
+                                        </div>
+                                    </div>)
+                            ))}
+                        </>
+                    </div>}
+            </div>
         </div>
     )
 }

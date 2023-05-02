@@ -155,6 +155,7 @@ export const nearMeTSlicer = createSlice({
     },
 })
 
+
 export const resetCountries = trendCountries.actions.reset
 export const resetTrends = trendsSlicer.actions.reset
 export const resetNearTrends = nearMeTSlicer.actions.reset

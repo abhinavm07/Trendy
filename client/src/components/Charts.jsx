@@ -9,6 +9,7 @@ import {
     Legend,
 } from 'chart.js';
 import {Bar} from 'react-chartjs-2';
+import {BiDownload, ImShare, IoSave} from "react-icons/all.js";
 
 ChartJS.register(
     CategoryScale,
@@ -28,11 +29,13 @@ function generateRandomColor(length = 6) {
     return colors;
 }
 
-export function Charts({chartOptions, data}) {
-    const {legendTitle, label, identifier, dataKey, extraOptions = {}} = chartOptions;
+export function Charts({chartOptions, data, extraOptions = {}}) {
+    const {legendTitle, label, identifier = null, dataKey = null} = chartOptions;
 
-    const labels = Object.values(data).map((item) => item[identifier]);
-    const chartData = Object.values(data).map((item) => item[dataKey]);
+    const labels = identifier ? Object.values(data).map((item) => item[identifier]) : Object.keys(data);
+    const chartData = dataKey ? Object.values(data).map((item) => item[dataKey]) : Object.values(data);
+
+    const {height = '100px', width = '100px', canSave = false, canExport = false, canShare = false} = extraOptions;
 
     const options = {
         ...extraOptions,
@@ -71,6 +74,37 @@ export function Charts({chartOptions, data}) {
 
     if (!labels.length) return <div className='no-trends'>No Trends</div>;
 
+    function saveChart() {
+        const canvas = document.querySelector('canvas');
+        const link = document.createElement('a');
+        const date = new Date();
+        link.download = `${label}_${date.getTime()}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+    }
 
-    return <Bar options={options} data={parsedData} height="100px"/>;
+    function shareChart() {
+
+    }
+
+    return <>
+        {(canExport || canSave) &&
+            (<div className='chart-actions flex float-right'>
+                {canSave &&
+                    (<div className='chart-action' title='Save Chart'>
+                        <IoSave className='saveChart cursor-pointer'/>
+                    </div>)
+                }{canExport &&
+                (<div className='chart-action' title='Download PNG' onClick={() => saveChart()}>
+                    <BiDownload className='downloadChart cursor-pointer'/>
+                </div>)
+            }
+                {canShare &&
+                    (<div className='chart-action' title='Share Chart' onClick={() => shareChart()}>
+                        <ImShare className='downloadChart cursor-pointer'/>
+                    </div>)
+                }
+            </div>)}
+        <Bar options={options} data={parsedData} height={height} width={width}/>
+    </>;
 }

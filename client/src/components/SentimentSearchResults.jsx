@@ -1,9 +1,10 @@
 import {negativeSentiment, neutralSentiment, positiveSentiment} from "../../../controllers/sentiments.jsx";
 
 const SentimentSearchResults = ({emotion}) => {
-    function renderEmotions(emotions) {
-        switch (emotion) {
-            case 'Positive':
+
+    function renderEmotions() {
+        switch (emotion?.toString()?.toUpperCase()) {
+            case 'POSITIVE':
                 return positiveSentiment;
             case 'Neutral':
                 return neutralSentiment;

@@ -4,9 +4,11 @@ import {twtUsers, reset} from '../features/tweetOfUser/tweetOfUserSlice'
 import Spinner from '../components/Spinner'
 import {toast} from 'react-toastify'
 import SentimentSearchResults from '../components/SentimentSearchResults.jsx'
-import {IoSearch} from "react-icons/all.js";
+import {IoAnalytics, IoSearch} from "react-icons/all.js";
 import SearchBar from "../components/SearchBar.jsx";
 import {Tooltip} from 'react-tooltip'
+import Modal from "../components/Modal.jsx";
+import {Charts} from "../components/Charts.jsx";
 
 
 const UserAnalytics = () => {
@@ -16,6 +18,18 @@ const UserAnalytics = () => {
 
     const {twtUsername} = formData
     const dispatch = useDispatch()
+
+    const [tweetContextModal, setTweetContextModal] = useState({
+        visible: false,
+        title: '',
+        body: '',
+    });
+
+    const [tweetBreakdownModal, setTweetBreakdownModal] = useState({
+        visible: false,
+        title: 'Tweets Context Breakdown',
+        body: '',
+    });
 
     const {twtUser, isLoading, isError, isSuccess, message} = useSelector(
         (state) => state.tweetuser
@@ -47,6 +61,29 @@ const UserAnalytics = () => {
         return `tweetbox sentiment-${sentiment}`;
     }
 
+    function openTweetContext(tweet) {
+        setTweetContextModal({
+            visible: tweet?.context ? true : false,
+            title: 'Tweet Context',
+            body: tweet?.context?.toString(),
+        });
+    }
+
+    function getBreakdownChart(tweets) {
+        if (!tweets) return;
+
+        const extraOptions = {
+            height: '400',
+            width: '700',
+        }
+        const breakdownOption = {
+            label: 'Breakdown',
+        };
+
+        return <Charts chartOptions={breakdownOption} data={tweets} extraOptions={extraOptions}/>
+    }
+
+
     return (
         <>
             <div className='sidecontainer'>
@@ -63,7 +100,7 @@ const UserAnalytics = () => {
                     buttonIcon={<IoSearch/>}
                 />
                 {twtUser?.userData && <div className='meta-user-details'>
-                    <div className='grid grid-cols-3 gap-4 mt-2'>
+                    <div className='grid grid-cols-4 gap-4 mt-2'>
                         <div className='col-span-1'>
                             <div className='flex flex-col meta-user-info'>
                                 Followers
@@ -79,22 +116,39 @@ const UserAnalytics = () => {
                                 Tweets
                             </div>
                         </div>
-                    </div>
-                    <div className='grid grid-cols-3 gap-4 mt-2'>
                         <div className='col-span-1'>
-                            <div className='flex flex-col'>
+                            <div className='flex flex-col meta-user-info'>
+                                Breakdown
+                            </div>
+                        </div>
+                    </div>
+                    <div className='grid grid-cols-4 gap-4 mt-2'>
+                        <div className='col-span-1'>
+                            <div className='flex flex-col user-detail-small'>
                                 {twtUser?.userData?.data?.public_metrics?.followers_count}
                             </div>
                         </div>
                         <div className='col-span-1'>
-                            <div className='flex flex-col'>
+                            <div className='flex flex-col user-detail-small'>
                                 {twtUser?.userData?.data?.public_metrics?.following_count}
                             </div>
                         </div>
                         <div className='col-span-1'>
-                            <div className='flex flex-col'>
+                            <div className='flex flex-col user-detail-small'>
                                 {twtUser?.userData?.data?.public_metrics?.tweet_count}
                             </div>
+                        </div>
+                        <div className='col-span-1'>
+                            <div className='flex flex-col user-detail-small' id='tweet-breakdown-chart-tooltip'
+                                 onClick={() => setTweetBreakdownModal({
+                                     visible: true,
+                                     title: 'Tweets Context Breakdown',
+                                     body: getBreakdownChart(twtUser?.contextVolume),
+                                 })}>
+                                &#8644;
+                            </div>
+                            <Tooltip anchorId='tweet-breakdown-chart-tooltip'
+                                     content='Click here to see the tweet breakdown'/>
                         </div>
                     </div>
                 </div>
@@ -124,9 +178,9 @@ const UserAnalytics = () => {
                                                         <SentimentSearchResults emotion={data.sentiment} key={data.id}/>
                                                     </div>
                                                 </div>
-                                                <Tooltip anchorId={index + '_tweet-sentiment'}
-                                                         content={'Sentiment of this tweet is ' + data.sentiment}
-                                                />
+                                                {/*<Tooltip anchorId={index + '_tweet-sentiment'}*/}
+                                                {/*         content={'Sentiment of this tweet is ' + data.sentiment}*/}
+                                                {/*/>*/}
                                                 <div className='avatar-username'>
                                                     <div className='avatar'>
                                                         <img
@@ -141,9 +195,12 @@ const UserAnalytics = () => {
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div className='tweet'>
-                                                    {data.tweet}
+                                                <div className='tweet'
+                                                     onClick={() => openTweetContext(data)}>
+                                                    <span id={index + "_tweet-context"}>{data.tweet}</span>
                                                 </div>
+                                                {<Tooltip anchorId={index + '_tweet-context'}
+                                                          content={data?.context ? 'Click to see the tweet context' : 'No context available'}/>}
                                             </div>
                                         </div>
                                     ))}
@@ -152,8 +209,15 @@ const UserAnalytics = () => {
                         </div>
                     </div>
                 </div>
-
             </div>
+            }
+            {
+                tweetContextModal.visible &&
+                <Modal context={tweetContextModal} close={() => setTweetContextModal({visible: false})}/>
+            }
+            {
+                tweetBreakdownModal.visible &&
+                <Modal context={tweetBreakdownModal} close={() => setTweetBreakdownModal({visible: false})}/>
             }
         </>
     )

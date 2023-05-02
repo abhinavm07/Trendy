@@ -1,4 +1,4 @@
-import {IoGitCompare, IoHappy, IoHelp, IoHome, IoSettingsOutline} from 'react-icons/io5'
+import {IoGitCompare, IoHappy, IoHelp, IoHome, IoSave, IoSettingsOutline} from 'react-icons/io5'
 import {useSelector} from "react-redux";
 import {ImUser, IoMdAnalytics} from "react-icons/all.js";
 import Navigation from "./Navigation.jsx";
@@ -20,19 +20,26 @@ const Drawer = () => {
             path: '/analytics'
         },
         {
-            name: 'Track User',
-            icon: <ImUser/>,
-            path: '/trackuser'
-        },
-        {
-            name: 'Comparision',
-            icon: <IoGitCompare/>,
-            path: '/comparision'
+            name: 'Favourites',
+            icon: <IoSave/>,
+            path: '/favourites'
         },
         {
             name: 'Sentiment Analysis',
             icon: <IoHappy/>,
             path: '/sentiment'
+        },
+        {
+            name: 'Track User',
+            icon: <ImUser/>,
+            path: '/trackuser',
+            disabled: true
+        },
+        {
+            name: 'Comparison',
+            icon: <IoGitCompare/>,
+            path: '/comparison',
+            disabled: true
         },
         {
             name: 'Support',

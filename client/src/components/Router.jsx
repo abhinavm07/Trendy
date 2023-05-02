@@ -20,7 +20,7 @@ export default function Router() {
         <Route path='/sentiment' element={<Home/>}/>
 
         <Route path='/register' element={<LoginRegister/>}/>
-        <Route path='/comparision' element={<ComparingUsers/>}/>
+        <Route path='/comparison' element={<ComparingUsers/>}/>
         <Route path='/analytics' element={<UserAnalytics/>}/>
         <Route path='/support' element={<UnderConstruction/>}/>
         <Route path='/setting' element={<UnderConstruction/>}/>

@@ -17,9 +17,33 @@ const {
   nearMeT,
   trendTweets,
   trendsAvailable,
+  getTrendSentiment,
 } = require("../controllers/trends");
 
 const { getTwtData, searchTwt } = require("../controllers/userData");
+const {
+  saveChart,
+  deleteChart,
+  retrieveChart,
+  addDataChart,
+  savedChart,
+  unSaveChart,
+} = require("../controllers/chartController");
+
+const {
+  saveTweets,
+  deleteTweet,
+  retrieveTweets,
+  addDataTweet,
+  savedTweets,
+} = require("../controllers/saveController");
+
+const {
+  shareContent,
+  retrieveSharedCharts,
+  retrieveSharedTweets,
+  unShareContent,
+} = require("../controllers/sharedController");
 
 Router.get("/homepage", homePage);
 
@@ -36,6 +60,25 @@ Router.post("/trendTweets", trendTweets);
 Router.post("/twtUser", getTwtData);
 Router.post("/search", searchTwt);
 Router.get("/availableCountry", trendsAvailable);
+// Router.get("/fetchSentiment/:trend", getTrendSentiment);
+Router.post("/saveChart", saveChart);
+Router.post("/deleteChart", deleteChart);
+Router.post("/retriveChart", retrieveChart);
+Router.post("/addChartData", addDataChart);
+Router.post("/savedCharts", savedChart);
+Router.post("/unsaveCharts", unSaveChart);
+
+Router.post("/saveTweet", saveTweets);
+Router.post("/deleteTweet", deleteTweet);
+Router.post("/retriveTweets", retrieveTweets);
+Router.post("/addTweetData", addDataTweet);
+Router.post("/savedTweets", savedTweets);
+// Router.post("/unsaveTweets", unsaveTweet);
+
+Router.post("/shareContent", shareContent);
+Router.post("/retriveSharedCharts", retrieveSharedCharts);
+Router.post("/retrieveSharedTweets", retrieveSharedTweets);
+Router.post("/unshareContent", unShareContent);
 
 // Router.use("/signup",express.static("./methods-public"));
 module.exports = Router;

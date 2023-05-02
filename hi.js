@@ -146,78 +146,75 @@ const v1Client = client.v1;
 
 // ehBhagwan();
 
-// const ehBhagwanV2 = async (req, res) => {
-//   let { text } = req.body;
-//   let myArray;
-//   myArray = text.split("/");
-//   console.log(myArray[5]);
+const ehBhagwanV2 = async (req, res) => {
+  let { text } = req.body;
+  let myArray;
+  myArray = text.split("/");
+  console.log(myArray[5]);
 
-//   const tweetOfID = await client.v2.singleTweet(myArray[5]);
-//   console.log(tweetOfID.data.text);
+  const tweetOfID = await client.v2.singleTweet(myArray[5]);
+  console.log(tweetOfID.data.text);
 
-//   const data = tweetOfID.data.text;
+  const data = tweetOfID.data.text;
 
-//   console.log("Hello");
+  console.log("Hello");
 
-//   const sentiment = getSentiment(data);
+  const sentiment = getSentiment(data);
 
-//   let sentimentRemark;
+  let sentimentRemark;
 
-//   if (sentiment === 1) {
-//     sentimentRemark = "Positive";
-//     console.log(sentimentRemark);
-//   }
+  if (sentiment === 1) {
+    sentimentRemark = "Positive";
+    console.log(sentimentRemark);
+  }
 
-//   if (sentiment === 0) {
-//     sentimentRemark = "Neutral";
-//     console.log(sentimentRemark);
-//   }
+  if (sentiment === 0) {
+    sentimentRemark = "Neutral";
+    console.log(sentimentRemark);
+  }
 
-//   if (sentiment === -1) {
-//     sentimentRemark = "Negative";
-//     console.log(sentimentRemark);
-//   }
-// };
+  if (sentiment === -1) {
+    sentimentRemark = "Negative";
+    console.log(sentimentRemark);
+  }
+};
 
-// const getSentiment = (data) => {
-//   if (!data.trim()) {
-//     return 0;
-//   }
+const getSentiment = (data) => {
+  if (!data.trim()) {
+    return 0;
+  }
 
-//   const lexed = aposToLexForm(data)
-//     .toLowerCase()
-//     .replace(/[^a-zA-Z\s]+/g, "");
+  const lexed = aposToLexForm(data)
+    .toLowerCase()
+    .replace(/[^a-zA-Z\s]+/g, "");
 
-//   const tokenized = tokenizer.tokenize(lexed);
+  const tokenized = tokenizer.tokenize(lexed);
 
-//   const fixedSpelling = tokenized.map((word) => spellCorrector.correct(word));
+  const fixedSpelling = tokenized.map((word) => spellCorrector.correct(word));
 
-//   const stopWordsRemoved = stopword.removeStopwords(fixedSpelling);
+  const stopWordsRemoved = stopword.removeStopwords(fixedSpelling);
 
-//   const analyzed = analyzer.getSentiment(stopWordsRemoved);
-//   console.log(stopWordsRemoved);
-//   console.log(analyzed);
-//   if (analyzed > 0) return 1; // positive
-//   if (analyzed === 0) return 0;
-//   if (isNaN(analyzed)) return 0;
-//   return -1;
-// };
+  const analyzed = analyzer.getSentiment(stopWordsRemoved);
+  console.log(stopWordsRemoved);
+  console.log(analyzed);
+  if (analyzed > 0) return 1; // positive
+  if (analyzed === 0) return 0;
+  if (isNaN(analyzed)) return 0;
+  return -1;
+};
 
 // ehBhagwanV2();
 
-// const tori = async () => {
-//   const user = await client.v2.userByUsername("ehhhtyoketa");
-//   const userId = user.data.id;
-//   const userTweets = await client.v2.userTimeline(`${userId}`, {
-//     exclude: "replies",
-//     "tweet.fields": "context_annotations",
-//   });
-//   console.log(userTweets);
+const tori = async () => {
+  const tweetOfID = await client.v2.singleTweet("1641769150698905601", {
+    "tweet.fields": "context_annotations",
+  });
+  console.log(tweetOfID);
 
-//   // const data = tweetOfID.data.text;
-// };
+  // const data = tweetOfID.data.text;
+};
 
-// tori();
+tori();
 
 // , {
 //     "tweet.fields": "context_annotations",

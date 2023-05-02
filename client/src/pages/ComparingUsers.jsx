@@ -5,7 +5,7 @@ const ComparingUsers = () => {
     <>
       <div className='w-full flex '>
         <h1 className=' items-start font-extrabold text-5xl'>
-          Comparision Users
+          comparison Users
         </h1>
       </div>
 
