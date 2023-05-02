@@ -13,10 +13,12 @@ const saveChart = asyncHandler(async (req, res) => {
   console.log(createdBy, chartOptions, data, deletedAt);
   // //find one where isDeleted is null
   if (chartID) {
-    const chartsExists = await savedSchema.findOne({ chartID });
+    const chartsExists = await savedSchema.findOne({ _id: chartID });
     if (chartsExists) {
-      res.status(200).json(chartsExists);
-      throw new Error("Chart Already Saved");
+      return res
+        .status(400)
+        .json({ msg: "Chart Already Saved", data: chartsExists });
+      // throw new Error("Chart Already Saved");
     }
   }
 
@@ -43,42 +45,70 @@ const saveChart = asyncHandler(async (req, res) => {
 });
 
 const deleteChart = async (req, res) => {
-  const { _id: chartID, isDeleted } = req.body;
+  const { chartID, createdBy } = req.body;
   //if chart has isDeleted dont do anything else delete
-  if (isDeleted) {
-    res.status(400);
-    throw new Error("Chart has already been deleted");
+  const savedChartExists = await savedSchema.findOne({
+    _id: chartID,
+    createdBy: createdBy,
+    isDeleted: true,
+  });
+  if (savedChartExists) {
+    console.log("Here");
+    res.status(400).json({
+      msg: `Tweet with the ID of : ${chartID} has already been deleted !`,
+    });
+    // throw new Error("Tweet has already been deleted");
   }
-  const delChart = await savedSchema.findByIdAndDelete({ _id: chartID });
-  console.log(delChart);
-  res.status(200).json({ msg: `Chart with the ID of : ${chartID} deleted !` });
+  const delTweet = await savedSchema.findOneAndUpdate(
+    { _id: chartID },
+    { isDeleted: true },
+    { deletedAt: new Date() }
+  );
+  res.status(200).json({ msg: `Tweet with the ID of : ${chartID} deleted !` });
 };
 
 const addDataChart = async (req, res) => {
   const { data, _id: chartID } = req.body;
-  const charts = await savedSchema.findById({ _id: chartID });
-  charts["data"].push(data);
-  res.status(200).json({ msg: "Successful !", charts });
+  if (chartID) {
+    const savedChartExists = await savedSchema.findById({
+      _id: chartID,
+    });
+    if (savedChartExists) {
+      const appendData = await savedSchema.findOneAndUpdate(
+        { _id: chartID },
+        { data: data }
+      );
+      return res.status(200).json({ msg: "Successful !", appendData });
+    }
+    res.status(404).json({ msg: "No such tweet found" });
+  }
 };
 
 const retrieveChart = async (req, res) => {
   const { userID } = req.body;
-  const charts = await savedSchema.find({ createdBy: userID });
-  res.status(200).json({ msg: charts });
+  const savedChartExists = await savedSchema.find({
+    createdBy: userID,
+    isDeleted: false,
+  });
+  res
+    .status(200)
+    .json({ msg: savedChartExists, dataHits: savedChartExists.length });
 };
 
-const savedChart = async (req, res) => {
-  //userID, chartId
-  //check if chartid for userid exists and isDeleted null
-  const { userID, _id: chartID, isDeleted } = req.body;
-  if (userID && chartID && !isDeleted) {
+const savedChart = async (userID, chartID) => {
+  if (userID && chartID) {
     console.log("ÏN");
-    const chartsExists = await savedSchema.findOne({ _id: chartID });
-    if (chartsExists["createdBy"] == userID) {
-      res.status(200).json(chartsExists);
+    const chartsExists = await savedSchema.findOne({
+      _id: chartID,
+      createdBy: userID,
+      isDeleted: false,
+    });
+    if (chartsExists) {
+      return true;
     }
+    return false;
   }
-  console.log(userID, chartID, isDeleted);
+  console.log(userID, chartID);
 };
 
 const unSaveChart = async (req, res) => {

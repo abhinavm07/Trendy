@@ -26,7 +26,6 @@ const {
   deleteChart,
   retrieveChart,
   addDataChart,
-  savedChart,
   unSaveChart,
 } = require("../controllers/chartController");
 
@@ -65,7 +64,7 @@ Router.post("/saveChart", saveChart);
 Router.post("/deleteChart", deleteChart);
 Router.post("/retriveChart", retrieveChart);
 Router.post("/addChartData", addDataChart);
-Router.post("/savedCharts", savedChart);
+// Router.post("/savedCharts", savedChart);
 Router.post("/unsaveCharts", unSaveChart);
 
 Router.post("/saveTweet", saveTweets);
