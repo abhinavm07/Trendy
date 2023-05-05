@@ -7,10 +7,9 @@ const saveChart = asyncHandler(async (req, res) => {
   // validation
   if (!createdBy || !data) {
     res.status(400);
-    throw new Error("Please Include all fileds");
+    throw new Error("Please Include all files");
   }
 
-  console.log(createdBy, chartOptions, data, deletedAt);
   // //find one where isDeleted is null
   if (chartID) {
     const chartsExists = await savedSchema.findOne({ _id: chartID });

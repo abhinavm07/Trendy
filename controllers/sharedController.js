@@ -24,16 +24,16 @@ const shareContent = asyncHandler(async (req, res) => {
     }
   }
 
-  const sharedContent = await sharedSchema.create({
+  const sharedContents = await sharedSchema.create({
     contentType,
     sharedTo,
     sharedBy,
     isDeleted,
     data,
   });
-  console.log(sharedContent);
+  console.log(sharedContents);
 
-  if (sharedContent) {
+  if (sharedContents) {
     res.status(201).json({
       _id: sharedSchema._id,
       sharedTo: sharedSchema.sharedTo,

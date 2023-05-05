@@ -6,36 +6,68 @@ const apiSecret = process.env.API_KEY_SECRET;
 const apiTokenkey = process.env.API_TOKEN;
 const apiTokenSecret = process.env.API_TOKEN_SECRET;
 
-const aposToLexForm = require("apos-to-lex-form");
-const { WordTokenizer, SentimentAnalyzer, PorterStemmer } = require("natural");
-const SpellCorrector = require("spelling-corrector");
-const stopword = require("stopword");
+const twitterClient = require("./dataFetcher");
 
-const tokenizer = new WordTokenizer();
-const spellCorrector = new SpellCorrector();
-spellCorrector.loadDictionary();
-
-const analyzer = new SentimentAnalyzer("English", PorterStemmer, "afinn");
+const staticAPI = require("../model/staticAPIdata");
 
 const client = new TwitterApi(`${process.env.BEARER_KEY}`);
 
-let contextByID = [];
+const trackingSchema = require("../model/trackUserSchema");
+
+const { userTracking } = require("../controllers/userTracking");
+// const { scheduler, logger } = require("./autoUserTracker");
+
+const { tweetsSentiment } = require("../controllers/sentimentAnalysis");
+
+const { tweetContext, contextVol } = require("../controllers/tweetContexts");
 
 const getTwtData = async (req, res) => {
-  const { twtUsername } = req.body;
+  const { twtUsername, staticID, trackUser, sysUsername } = req.body;
   let tweetsColec = [];
   let userAnnotes = [];
+  let user;
+  let staticData;
+  let userTweets;
+  // const updateData = scheduler;
 
-  const user = await client.v2.userByUsername(twtUsername, {
-    "user.fields": "public_metrics",
-  });
+  // const user = await twitterClient("v2", "userByUsername", twtUsername, {
+  //   "user.fields": "public_metrics",
+  // });
+
+  if (staticID) {
+    staticData = await staticAPI.findById({ _id: staticID });
+    user = staticData["data"];
+  } else {
+    user = await client.v2.userByUsername(`${twtUsername}`, {
+      "user.fields": "public_metrics",
+    });
+  }
+
   const userId = user?.data?.id || null;
   if (userId) {
-    const userTweets = await client.v2.userTimeline(`${userId}`, {
-      exclude: "retweets,replies",
-      "tweet.fields": "context_annotations",
-    });
+    if (staticID) {
+      userTweets = staticData["userTweets"];
+    } else {
+      userTweets = await client.v2.userTimeline(`${userId}`, {
+        exclude: "retweets,replies",
+        "tweet.fields": "context_annotations",
+      });
+    }
+
     if (userTweets) {
+      if (!staticID) {
+        // const staticSearch = await staticAPI.findOne({
+        //   data: user,
+        //   userTweets: userTweets,
+        // });
+        // if (!staticSearch) {
+        staticData = await staticAPI.create({
+          data: user,
+          userTweets: userTweets,
+        });
+        // }
+      }
+      //
       let twtData = userTweets["_realData"]["data"];
       for (const twt of twtData) {
         const id = twt["id"];
@@ -59,6 +91,9 @@ const getTwtData = async (req, res) => {
         }
       }
       const contextVolume = await contextVol(userAnnotes.flat());
+      if (trackUser) {
+        userTracking(user, sysUsername, tweetsColec);
+      }
       return res.status(200).json({
         userData: user,
         twtData: tweetsColec,
@@ -76,7 +111,7 @@ const getTwtData = async (req, res) => {
 
 const searchTwt = async (req, res) => {
   let i = 0;
-  let tweetColec = [];
+  let tweetsColec = [];
   const { search } = req.body;
   const recentTweets = await client.v2.tweetCountRecent(search);
 
@@ -88,77 +123,18 @@ const searchTwt = async (req, res) => {
   for await (const tweet of searchTweets) {
     i++;
     if (i < 20) {
-      tweetColec.push([tweet.id, tweet.text]);
+      tweetsColec.push([tweet.id, tweet.text]);
     } else if (i >= 20) {
       break;
     }
   }
-  tweetColec.push([`recent tweet count : ${recentTweets.data[0].tweet_count}`]);
-  res.json(tweetColec);
+  tweetsColec.push([
+    `recent tweet count : ${recentTweets.data[0].tweet_count}`,
+  ]);
+  res.json(tweetsColec);
 };
 
-const tweetsSentiment = async (data) => {
-  const sentiment = getSentiment(data);
-
-  let sentimentRemark;
-
-  if (sentiment === 1) {
-    sentimentRemark = "Positive";
-    return "Positive";
-  }
-
-  if (sentiment === 0) {
-    sentimentRemark = "Neutral";
-    return "Neutral";
-  }
-
-  if (sentiment === -1) {
-    sentimentRemark = "Negative";
-    return "Negative";
-  }
+module.exports = {
+  getTwtData,
+  searchTwt,
 };
-
-const getSentiment = (data) => {
-  if (!data.trim()) {
-    return 0;
-  }
-
-  const lexed = aposToLexForm(data)
-    .toLowerCase()
-    .replace(/[^a-zA-Z\s]+/g, "");
-
-  const tokenized = tokenizer.tokenize(lexed);
-
-  const fixedSpelling = tokenized.map((word) => spellCorrector.correct(word));
-
-  const stopWordsRemoved = stopword.removeStopwords(fixedSpelling);
-
-  const analyzed = analyzer.getSentiment(stopWordsRemoved);
-  if (analyzed > 0) return 1; // positive
-  if (analyzed === 0) return 0;
-  if (isNaN(analyzed)) return 0;
-  return -1;
-};
-
-const tweetContext = (tweets, id) => {
-  tweets.forEach((element) => {
-    if (contextByID[id]) {
-      if (!contextByID[id].includes(element["entity"]["name"])) {
-        contextByID[id].push(element["entity"]["name"]);
-      }
-    } else {
-      contextByID[id] = [element["entity"]["name"]];
-    }
-  });
-  return contextByID;
-};
-
-const contextVol = (annots) => {
-  let contextVols = {};
-  annots.forEach((element) => {
-    contextVols[element] = (contextVols[element] || 0) + 1;
-  });
-  return contextVols;
-};
-
-module.exports = { getTwtData, searchTwt };
