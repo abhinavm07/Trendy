@@ -3,27 +3,33 @@ const app = express();
 const { TwitterApi } = require("twitter-api-v2");
 require("dotenv/config");
 
-const apiKey = process.env.API_KEY;
-const apiSecret = process.env.API_KEY_SECRET;
-const accessTokenkey = process.env.ACCESS_TOKEN;
-const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
-
-// OAuth 1.0a (User context)
-const userClient = new TwitterApi({
-  appKey: apiKey,
-  appSecret: apiSecret,
-  accessToken: accessTokenkey,
-  accessSecret: accessTokenSecret,
-});
+const trendStatic = require("../model/trendStatic");
 
 const client = new TwitterApi(`${process.env.BEARER_KEY}`);
+
+const { tweetsSentiment } = require("../controllers/sentimentAnalysis");
+
+const getSentiment = tweetsSentiment;
 
 const v1Client = client.v1;
 const trendsV1 = async (req, res) => {
   const id = req.body.woeid;
+  const { trendID } = req.body;
+  let trendsOfNy = [];
+  let trendStaticData;
   try {
-    const trendsOfNy = await v1Client.trendsByPlace(Number(id));
+    if (!trendID) {
+      trendsOfNy = await v1Client.trendsByPlace(Number(id));
+      trendStaticData = await trendStatic.create({
+        data: trendsOfNy,
+      });
+    } else {
+      const trendStaticExists = await trendStatic.findById({ _id: trendID });
+      trendsOfNy = trendStaticExists["data"];
+    }
+
     let trendColec = [];
+
     for (const { trends, created_at } of trendsOfNy) {
       for (const trend of trends) {
         if (trend.tweet_volume) {

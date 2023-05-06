@@ -1,11 +1,6 @@
 const { TwitterApi } = require("twitter-api-v2");
 require("dotenv/config");
 
-const apiKey = process.env.API_KEY;
-const apiSecret = process.env.API_KEY_SECRET;
-const apiTokenkey = process.env.API_TOKEN;
-const apiTokenSecret = process.env.API_TOKEN_SECRET;
-
 const twitterClient = require("./dataFetcher");
 
 const staticAPI = require("../model/staticAPIdata");
@@ -15,7 +10,7 @@ const client = new TwitterApi(`${process.env.BEARER_KEY}`);
 const trackingSchema = require("../model/trackUserSchema");
 
 const { userTracking } = require("../controllers/userTracking");
-// const { scheduler, logger } = require("./autoUserTracker");
+const { logger } = require("./autoUserTracker");
 
 const { tweetsSentiment } = require("../controllers/sentimentAnalysis");
 
@@ -28,7 +23,7 @@ const getTwtData = async (req, res) => {
   let user;
   let staticData;
   let userTweets;
-  // const updateData = scheduler;
+  // const updateData = logger(sysUsername);
 
   // const user = await twitterClient("v2", "userByUsername", twtUsername, {
   //   "user.fields": "public_metrics",

@@ -44,6 +44,15 @@ const {
   unShareContent,
 } = require("../controllers/sharedController");
 
+const {
+  retriveTrackedUserData,
+  suspendTracking,
+  changeTrackStatus,
+} = require("../controllers/userTracking");
+
+const { autoTracking } = require("../controllers/autoUserTracker");
+// const { trackingStatic } = require("../controllers/autoUserTracker");
+
 Router.get("/homepage", homePage);
 
 Router.get("/allData", getStatic);
@@ -79,5 +88,13 @@ Router.post("/retriveSharedCharts", retrieveSharedCharts);
 Router.post("/retrieveSharedTweets", retrieveSharedTweets);
 Router.post("/unshareContent", unShareContent);
 
+Router.post("/retriveTrackedUsers", retriveTrackedUserData);
+Router.post("/suspendTracking", suspendTracking);
+
+Router.post("/changeTrackStatus", changeTrackStatus);
+
+Router.post("/autoTracking", autoTracking);
+
+// Router.post("/staticTracking", trackingStatic);
 // Router.use("/signup",express.static("./methods-public"));
 module.exports = Router;

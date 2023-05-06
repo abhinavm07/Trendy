@@ -52,9 +52,8 @@ const deleteTweet = async (req, res) => {
   const savedTweetExists = await savedTweetsSchema.findOne({
     _id: savedID,
     createdBy: createdBy,
-    isDeleted: true,
   });
-  if (savedTweetExists) {
+  if (savedTweetExists["isDeleted"] === true) {
     console.log("Here");
     res.status(400).json({
       msg: `Tweet with the ID of : ${savedID} has already been deleted !`,
