@@ -7,14 +7,14 @@ const staticAPI = require("../model/staticAPIdata");
 
 const client = new TwitterApi(`${process.env.BEARER_KEY}`);
 
-const trackingSchema = require("../model/trackUserSchema");
-
 const { userTracking } = require("../controllers/userTracking");
-const { logger } = require("./autoUserTracker");
+// const { logger } = require("./autoUserTracker");
 
 const { tweetsSentiment } = require("../controllers/sentimentAnalysis");
 
 const { tweetContext, contextVol } = require("../controllers/tweetContexts");
+
+const { retriveSysUsers } = require("../controllers/admin");
 
 const getTwtData = async (req, res) => {
   const { twtUsername, staticID, trackUser, sysUsername } = req.body;
@@ -23,6 +23,8 @@ const getTwtData = async (req, res) => {
   let user;
   let staticData;
   let userTweets;
+
+  retriveSysUsers();
   // const updateData = logger(sysUsername);
 
   // const user = await twitterClient("v2", "userByUsername", twtUsername, {
@@ -51,38 +53,36 @@ const getTwtData = async (req, res) => {
 
     if (userTweets) {
       if (!staticID) {
-        // const staticSearch = await staticAPI.findOne({
-        //   data: user,
-        //   userTweets: userTweets,
-        // });
-        // if (!staticSearch) {
         staticData = await staticAPI.create({
           data: user,
           userTweets: userTweets,
         });
-        // }
       }
-      //
       let twtData = userTweets["_realData"]["data"];
       for (const twt of twtData) {
         const id = twt["id"];
-        const twtSentiment = await tweetsSentiment(twt["text"]);
-        const annotations = twt["context_annotations"];
-        if (annotations) {
-          const context = tweetContext(annotations, id);
-          userAnnotes.push(context[id]);
-          tweetsColec.push({
-            id: twt["id"],
-            tweet: twt["text"],
-            sentiment: twtSentiment,
-            context: context[id],
-          });
+        const text = twt["text"].replace(/(?:https?|ftp):\/\/[\n\S]+/g, "");
+        if (text) {
+          const twtSentiment = await tweetsSentiment(text);
+          const annotations = twt["context_annotations"];
+          if (annotations) {
+            const context = tweetContext(annotations, id);
+            userAnnotes.push(context[id]);
+            tweetsColec.push({
+              id: twt["id"],
+              tweet: text,
+              sentiment: twtSentiment,
+              context: context[id],
+            });
+          } else {
+            tweetsColec.push({
+              id: twt["id"],
+              tweet: text,
+              sentiment: twtSentiment,
+            });
+          }
         } else {
-          tweetsColec.push({
-            id: twt["id"],
-            tweet: twt["text"],
-            sentiment: twtSentiment,
-          });
+          console.log(twt["text"]);
         }
       }
       const contextVolume = await contextVol(userAnnotes.flat());

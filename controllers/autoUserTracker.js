@@ -4,7 +4,6 @@ const cron = require("node-cron");
 const trackingSchema = require("../model/trackUserSchema");
 const client = new TwitterApi(`${process.env.BEARER_KEY}`);
 
-const staticAPI = require("../model/staticAPIdata");
 const { tweetContext, contextVol } = require("../controllers/tweetContexts");
 
 let trackedID = [];
@@ -64,16 +63,12 @@ const idList = async () => {
 };
 
 const getFreshData = async (user, sysUsername, tweetsColec, trackID) => {
-  // console.log(trackID);
   let userAnnotes = [];
   let UserDataExists;
-  // const trackedUser = user["data"]["username"];
   if (trackID) {
     UserDataExists = await trackingSchema.findById({
       _id: trackID,
     });
-
-    // console.log(UserDataExists["trackedUser"], sysUsername);
 
     if (UserDataExists) {
       const twitterData = await UserDataExists.twtData;
@@ -117,16 +112,13 @@ const getFreshData = async (user, sysUsername, tweetsColec, trackID) => {
       { contextVolume: contextVolume }
     );
   }
-  // console.log(UserDataExists);
 };
 
 const tweetAndAnnots = async (userTweets, user, sysUsername, trackID) => {
   let userAnnotes = [];
   let tweetsColec = [];
   let twtData = userTweets["_realData"]["data"];
-  // console.log(
-  //   `${twtData[0]["text"]} , user ko :${user["data"]["username"]}, twtUsername: ${twtUsername}`
-  // );
+
   for (const twt of twtData) {
     const id = twt["id"];
     const twtSentiment = await tweetsSentiment(twt["text"]);

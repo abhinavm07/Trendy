@@ -53,6 +53,8 @@ const {
 const { autoTracking } = require("../controllers/autoUserTracker");
 // const { trackingStatic } = require("../controllers/autoUserTracker");
 
+const { retriveStatic } = require("../controllers/getAllStatic");
+
 Router.get("/homepage", homePage);
 
 Router.get("/allData", getStatic);
@@ -94,6 +96,8 @@ Router.post("/suspendTracking", suspendTracking);
 Router.post("/changeTrackStatus", changeTrackStatus);
 
 Router.post("/autoTracking", autoTracking);
+
+Router.get("/retriveStatic", retriveStatic);
 
 // Router.post("/staticTracking", trackingStatic);
 // Router.use("/signup",express.static("./methods-public"));

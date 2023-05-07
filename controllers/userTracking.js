@@ -1,5 +1,5 @@
 const trackingSchema = require("../model/trackUserSchema");
-const { tweetContext, contextVol } = require("../controllers/tweetContexts");
+const { contextVol } = require("../controllers/tweetContexts");
 
 const userTracking = async (user, sysUsername, tweetsColec) => {
   let userAnnotes = [];
@@ -8,8 +8,14 @@ const userTracking = async (user, sysUsername, tweetsColec) => {
   UserDataExists = await trackingSchema.findOne({
     trackedBy: sysUsername,
     trackedUser: user["data"]["username"],
-    trackingStatus: true,
   }); // console.log(UserDataExists);
+  const appendStatus = await trackingSchema.findOneAndUpdate(
+    {
+      trackedBy: sysUsername,
+      trackedUser: user["data"]["username"],
+    },
+    { trackingStatus: true }
+  );
 
   if (UserDataExists) {
     userData = await UserDataExists.twtData;
@@ -54,10 +60,10 @@ const userTracking = async (user, sysUsername, tweetsColec) => {
 };
 
 const retriveTrackedUserData = async (req, res) => {
-  const { userID } = req.body;
+  const { userID, trackingStatus } = req.body;
   const trackedDataExists = await trackingSchema.find({
     trackedBy: userID,
-    trackingStatus: true,
+    trackingStatus: trackingStatus,
   });
   if (trackedDataExists) {
     return res
