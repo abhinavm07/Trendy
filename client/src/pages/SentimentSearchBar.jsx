@@ -61,10 +61,10 @@ const SentimentSearchBar = () => {
         <div className='sentiment-analysis-result'>
           <div key={1}>
             {' '}
-            <span>Sentiment:</span> {emotion.Sentiment}
+            <span>Sentiment:</span> {emotion?.Sentiment}
           </div>
           <div className='flex justify-center items-center h-20 w-full my-10'>
-            <SentimentSearchResults emotion={emotion.Sentiment} />
+            <SentimentSearchResults emotion={emotion?.Sentiment} />
           </div>
         </div>
       </div>

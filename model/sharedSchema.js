@@ -1,17 +1,14 @@
 const mongoose = require("mongoose");
 const sharedSchema = mongoose.Schema(
   {
-    contentType: { type: String, required: [true, "Content not available"] },
-    sharedBy: { type: String, required: [true, "tweet id required"] },
-    sharedTo: { type: String, required: [true, "Full Name required"] },
+    contentType: { type: String, required: [true, "Content not available"] }, //chart / tweet
+    sharedBy: { type: String, required: [true, "tweet id required"] }, //req.user.email
+    sharedTo: { type: String, required: [true, "Full Name required"] }, //field ko input ko email
     isDeleted: {
       type: Boolean,
-      required: [true, "tweets required"],
       default: false,
     },
-    data: { type: Date, required: [true, "userID required"] },
-    sharedAt: { type: Date, required: [true, "userID required"] },
-    savedId: { type: String, required: [true, "Not saved"] },
+    savedId: { type: String, required: [true, "Not saved"] }, //_id
   },
   { timestamps: true }
 );

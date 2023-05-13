@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -10,6 +10,10 @@ import {
 } from 'chart.js';
 import {Bar} from 'react-chartjs-2';
 import {BiDownload, ImShare, IoSave} from "react-icons/all.js";
+import {getSharedContents, saveTrendChart, shareContent} from "../features/favourites/favouriteSlice.js";
+import {useDispatch} from "react-redux";
+import {toast} from "react-toastify";
+import ShareModal from "./ShareModal.jsx";
 
 ChartJS.register(
     CategoryScale,
@@ -30,7 +34,8 @@ function generateRandomColor(length = 6) {
 }
 
 export function Charts({chartOptions, data, extraOptions = {}}) {
-    const {legendTitle, label, identifier = null, dataKey = null} = chartOptions;
+    const dispatch = useDispatch();
+    const {legendTitle, label, identifier = null, dataKey = null, chartTitle} = chartOptions;
 
     const labels = identifier ? Object.values(data).map((item) => item[identifier]) : Object.keys(data);
     const chartData = dataKey ? Object.values(data).map((item) => item[dataKey]) : Object.values(data);
@@ -74,7 +79,7 @@ export function Charts({chartOptions, data, extraOptions = {}}) {
 
     if (!labels.length) return <div className='no-trends'>No Trends</div>;
 
-    function saveChart() {
+    function exportChart() {
         const canvas = document.querySelector('canvas');
         const link = document.createElement('a');
         const date = new Date();
@@ -83,19 +88,50 @@ export function Charts({chartOptions, data, extraOptions = {}}) {
         link.click();
     }
 
-    function shareChart() {
+    const [shareModalVisibility, setShareModalVisibility] = useState(false);
 
+    async function shareFunctionCallback(email) {
+        const shareInfo = {sharedTo: email, contentType: 'chart', savedId: extraOptions.id};
+        const res = await dispatch(shareContent(shareInfo));
+        const {msg, type} = res.payload;
+        if (msg) {
+            toast[type](msg);
+        }
+        if (type === 'success') {
+            setShareModalVisibility(false);
+            dispatch(getSharedContents());
+        }
     }
 
-    return <>
+    function shareChart() {
+        setShareModalVisibility(true);
+        console.log(shareModalVisibility)
+    }
+
+    async function saveChart() {
+        toast.info('Saving Chart...');
+        const saveData = {
+            chartOptions,
+            data,
+            deletedAt: null,
+            chartID: null,
+        };
+        const checkSave = await dispatch(saveTrendChart(saveData));
+        if (checkSave?.payload?.saved) {
+            toast.success('Chart Saved Successfully');
+        }
+    }
+
+
+    return <div className='flex flex-col'>
         {(canExport || canSave) &&
-            (<div className='chart-actions flex float-right'>
+            (<div className='chart-actions flex flex-row ml-auto'>
                 {canSave &&
-                    (<div className='chart-action' title='Save Chart'>
+                    (<div className='chart-action' title='Save Chart' onClick={() => saveChart()}>
                         <IoSave className='saveChart cursor-pointer'/>
                     </div>)
                 }{canExport &&
-                (<div className='chart-action' title='Download PNG' onClick={() => saveChart()}>
+                (<div className='chart-action' title='Download PNG' onClick={() => exportChart()}>
                     <BiDownload className='downloadChart cursor-pointer'/>
                 </div>)
             }
@@ -105,6 +141,7 @@ export function Charts({chartOptions, data, extraOptions = {}}) {
                     </div>)
                 }
             </div>)}
+        {shareModalVisibility && <ShareModal action={shareFunctionCallback} type='chart'/>}
         <Bar options={options} data={parsedData} height={height} width={width}/>
-    </>;
+    </div>;
 }

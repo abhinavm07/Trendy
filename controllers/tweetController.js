@@ -1,56 +1,49 @@
 const asyncHandler = require("express-async-handler");
 const savedTweetsSchema = require("../model/savedTweetsSchema");
 
-const saveCharts = asyncHandler(async (req, res) => {
-  const {
-    tweetByUsername,
-    tweetId,
-    tweetByFullname,
-    TweetL,
-    createdBy,
-    Sentiment,
-  } = req.body;
+const saveTweets = asyncHandler(async (req, res) => {
+  const {user, tweetData} = req.body;
 
+  const {id: userId, name, public_metrics, username} = user;
+  const {id, tweet, sentiment, context} = tweetData;
   // validation
   if (
-    !tweetByUsername ||
-    !tweetId ||
-    !tweetByFullname ||
-    !TweetL ||
-    !createdBy ||
-    !Sentiment
+    !userId ||
+    !name ||
+    !id ||
+    !tweet
   ) {
     res.status(400);
-    throw new Error("Please Include all fileds");
+    throw new Error("Please Include all fields");
   }
 
-  //Create User
-  const stackCharts = await savedTweetsSchema.create({
-    tweetByUsername,
-    tweetId,
-    tweetByFullname,
-    TweetL,
-    createdBy,
-    Sentiment,
-    extraOptions,
-    deletedAt,
+  const tweetsExists = await savedTweetsSchema.findOne({
+    createdBy: req.user.email,
+    tweetID: id,
   });
-
-  if (stackCharts) {
-    res.status(201).json({
-      _id: savedTweetsSchema._id,
-      tweetByUsername: savedTweetsSchema.tweetByUsername,
-      tweetId: savedTweetsSchema.tweetId,
-      tweetByFullname: savedTweetsSchema.tweetByFullname,
-      TweetL: savedTweetsSchema.TweetL,
-      createdBy: savedTweetsSchema.createdBy,
-      Sentiment: savedTweetsSchema.Sentiment,
-      extraOptions: savedTweetsSchema.extraOptions,
-      deletedAt: savedTweetsSchema.deletedAt,
-    });
-  } else {
+  if (tweetsExists) {
     res.status(400);
-    throw new Error("Invalid user data");
+    throw new Error("Tweet Already Saved");
+  } else {
+    const stackCharts = await savedTweetsSchema.create({
+      tweetByUsername: username,
+      tweetID: id,
+      tweetByFullname: name,
+      tweet,
+      createdBy: req.user.email,
+      sentiment,
+      context,
+    });
+
+    if (stackCharts) {
+      res.status(201).json({
+        _id: savedTweetsSchema.tweetID,
+        success: true
+      });
+    } else {
+      res.status(400);
+      throw new Error("Invalid user data");
+    }
   }
 });
 
@@ -66,10 +59,14 @@ const addData = async (req, res) => {
   res.status(200).json({ msg: "Successful !" });
 };
 
-const retriveCharts = async (req, res) => {
-  const { id: userID } = req.params;
-  const savedTweets = await model.find({ _id: userID });
-  res.status(200).json({ msg: savedTweets });
+const retriveTweets = async (req, res) => {
+  const { email } = req.user;
+  const savedTweets = await savedTweetsSchema.find({ createdBy: email }).sort({createdAt: -1});
+  if (savedTweets) {
+    res.status(200).json(savedTweets);
+  } else {
+    res.send("Sorry no such data found");
+  }
 };
 
-module.exports = { saveCharts, deleteCharts, retriveCharts, addData };
+module.exports = { saveTweets, deleteTweets, retriveTweets, addData };

@@ -1,5 +1,6 @@
 const { TwitterApi } = require("twitter-api-v2");
 require("dotenv/config");
+const asyncHandler = require("express-async-handler");
 
 const twitterClient = require("./dataFetcher");
 
@@ -12,19 +13,27 @@ const { userTracking } = require("../controllers/userTracking");
 
 const { tweetsSentiment } = require("../controllers/sentimentAnalysis");
 
-const { tweetContext, contextVol } = require("../controllers/tweetContexts");
+const {
+  tweetContext,
+  calculateVolume,
+  arrayValue,
+} = require("../controllers/tweetContexts");
 
-const { retriveSysUsers } = require("../controllers/admin");
+// const { retriveSysUsers } = require("../controllers/admin");
 
-const getTwtData = async (req, res) => {
+const { getRecomendations } = require("../controllers/recommendation");
+
+const getTwtData = asyncHandler(async (req, res) => {
   const { twtUsername, staticID, trackUser, sysUsername } = req.body;
   let tweetsColec = [];
   let userAnnotes = [];
   let user;
   let staticData;
   let userTweets;
+  let contextReps = [];
+  let sentimentArray = [];
 
-  retriveSysUsers();
+  // retriveSysUsers();
   // const updateData = logger(sysUsername);
 
   // const user = await twitterClient("v2", "userByUsername", twtUsername, {
@@ -35,7 +44,7 @@ const getTwtData = async (req, res) => {
     staticData = await staticAPI.findById({ _id: staticID });
     user = staticData["data"];
   } else {
-    user = await client.v2.userByUsername(`${twtUsername}`, {
+    user = await twitterClient("v2", "userByUsername", twtUsername, {
       "user.fields": "public_metrics",
     });
   }
@@ -45,7 +54,7 @@ const getTwtData = async (req, res) => {
     if (staticID) {
       userTweets = staticData["userTweets"];
     } else {
-      userTweets = await client.v2.userTimeline(`${userId}`, {
+      userTweets = await twitterClient("v2", "userTimeline", userId, {
         exclude: "retweets,replies",
         "tweet.fields": "context_annotations",
       });
@@ -58,12 +67,15 @@ const getTwtData = async (req, res) => {
           userTweets: userTweets,
         });
       }
+      // console.log(userTweets["_realData"]);
       let twtData = userTweets["_realData"]["data"];
+      // console.log(twtData);
       for (const twt of twtData) {
         const id = twt["id"];
         const text = twt["text"].replace(/(?:https?|ftp):\/\/[\n\S]+/g, "");
         if (text) {
           const twtSentiment = await tweetsSentiment(text);
+          sentimentArray.push(twtSentiment);
           const annotations = twt["context_annotations"];
           if (annotations) {
             const context = tweetContext(annotations, id);
@@ -85,7 +97,15 @@ const getTwtData = async (req, res) => {
           console.log(twt["text"]);
         }
       }
-      const contextVolume = await contextVol(userAnnotes.flat());
+      const contextVolume = calculateVolume(userAnnotes.flat());
+      const sentimentVolume = calculateVolume(sentimentArray.flat());
+      const contextValues = arrayValue(contextVolume);
+      // const recommendations = await getRecomendations(
+      //   contextValues,
+      //   user.data.username
+      // );
+      // console.log(recommendations);
+
       if (trackUser) {
         userTracking(user, sysUsername, tweetsColec);
       }
@@ -93,6 +113,8 @@ const getTwtData = async (req, res) => {
         userData: user,
         twtData: tweetsColec,
         contextVolume: contextVolume,
+        sentimentVolume: sentimentVolume,
+        contextValues: contextValues,
       });
     }
     return res
@@ -102,15 +124,15 @@ const getTwtData = async (req, res) => {
       );
   }
   return res.status(404).send("User not found with the given username.");
-};
+});
 
-const searchTwt = async (req, res) => {
+const searchTwt = asyncHandler(async (req, res) => {
   let i = 0;
   let tweetsColec = [];
   const { search } = req.body;
-  const recentTweets = await client.v2.tweetCountRecent(search);
+  const recentTweets = await twitterClient("v2", "tweetCountRecent", search);
 
-  const searchTweets = await client.v2.search(search, {
+  const searchTweets = await twitterClient("v2", "search", search, {
     "media.fields": "url",
   });
 
@@ -127,7 +149,7 @@ const searchTwt = async (req, res) => {
     `recent tweet count : ${recentTweets.data[0].tweet_count}`,
   ]);
   res.json(tweetsColec);
-};
+});
 
 module.exports = {
   getTwtData,

@@ -4,7 +4,10 @@ const cron = require("node-cron");
 const trackingSchema = require("../model/trackUserSchema");
 const client = new TwitterApi(`${process.env.BEARER_KEY}`);
 
-const { tweetContext, contextVol } = require("../controllers/tweetContexts");
+const {
+  tweetContext,
+  calculateVolume,
+} = require("../controllers/tweetContexts");
 
 let trackedID = [];
 
@@ -102,7 +105,7 @@ const getFreshData = async (user, sysUsername, tweetsColec, trackID) => {
         userAnnotes.push(element["context"]);
       }
     });
-    const contextVolume = contextVol(userAnnotes.flat());
+    const contextVolume = calculateVolume(userAnnotes.flat());
     const appendUserData = await trackingSchema.findOneAndUpdate(
       {
         trackedBy: sysUsername,

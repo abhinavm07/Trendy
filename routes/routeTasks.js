@@ -1,23 +1,14 @@
 const express = require("express");
 const Router = express.Router();
-const {
-  homePage,
-  signup,
-  getStatic,
-  getUser,
-  addData,
-  deleteData,
-  login,
-  dashboard,
-  emotion,
-} = require("../controllers/logic");
+const { protect } = require("../middleware/authMiddleware");
+Router.use(protect);
 
 const {
   trendsV1,
   nearMeT,
   trendTweets,
   trendsAvailable,
-  getTrendSentiment,
+  // getTrendSentiment,
 } = require("../controllers/trends");
 
 const { getTwtData, searchTwt } = require("../controllers/userData");
@@ -31,17 +22,19 @@ const {
 
 const {
   saveTweets,
-  deleteTweet,
-  retrieveTweets,
-  addDataTweet,
-  savedTweets,
-} = require("../controllers/saveController");
+  deleteTweets,
+  retriveTweets,
+  addData,
+} = require("../controllers/tweetController");
 
 const {
   shareContent,
   retrieveSharedCharts,
   retrieveSharedTweets,
   unShareContent,
+  retrieveSharedTweetsBy,
+  retrieveSharedChartsBy,
+  retrieveAllSharedContent,
 } = require("../controllers/sharedController");
 
 const {
@@ -55,15 +48,6 @@ const { autoTracking } = require("../controllers/autoUserTracker");
 
 const { retriveStatic } = require("../controllers/getAllStatic");
 
-Router.get("/homepage", homePage);
-
-Router.get("/allData", getStatic);
-Router.get("/add", addData);
-Router.get("/username", getUser);
-Router.delete("/:id", deleteData);
-
-Router.post("/sentiment", emotion);
-Router.route("/dashboard").get(dashboard);
 Router.post("/trend", trendsV1);
 Router.post("/nearMe", nearMeT);
 Router.post("/trendTweets", trendTweets);
@@ -73,22 +57,25 @@ Router.get("/availableCountry", trendsAvailable);
 // Router.get("/fetchSentiment/:trend", getTrendSentiment);
 Router.post("/saveChart", saveChart);
 Router.post("/deleteChart", deleteChart);
-Router.post("/retriveChart", retrieveChart);
+Router.post("/retrieveChart", retrieveChart);
 Router.post("/addChartData", addDataChart);
 // Router.post("/savedCharts", savedChart);
 Router.post("/unsaveCharts", unSaveChart);
 
 Router.post("/saveTweet", saveTweets);
-Router.post("/deleteTweet", deleteTweet);
-Router.post("/retriveTweets", retrieveTweets);
-Router.post("/addTweetData", addDataTweet);
-Router.post("/savedTweets", savedTweets);
+Router.post("/deleteTweets", deleteTweets);
+Router.post("/retrieveTweets", retriveTweets);
+Router.post("/addTweetData", addData);
+// Router.post("/savedTweets", savedTweets);
 // Router.post("/unsaveTweets", unsaveTweet);
 
 Router.post("/shareContent", shareContent);
 Router.post("/retriveSharedCharts", retrieveSharedCharts);
 Router.post("/retrieveSharedTweets", retrieveSharedTweets);
+Router.post("/retrieveAllShared", retrieveAllSharedContent);
 Router.post("/unshareContent", unShareContent);
+Router.post("/retriveSharedChartsByUser", retrieveSharedTweetsBy);
+Router.post("/retrieveSharedTweetsByUser", retrieveSharedChartsBy);
 
 Router.post("/retriveTrackedUsers", retriveTrackedUserData);
 Router.post("/suspendTracking", suspendTracking);
@@ -96,8 +83,7 @@ Router.post("/suspendTracking", suspendTracking);
 Router.post("/changeTrackStatus", changeTrackStatus);
 
 Router.post("/autoTracking", autoTracking);
-
-Router.get("/retriveStatic", retriveStatic);
+Router.post("/retriveStatic", retriveStatic);
 
 // Router.post("/staticTracking", trackingStatic);
 // Router.use("/signup",express.static("./methods-public"));

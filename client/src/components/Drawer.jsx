@@ -41,12 +41,12 @@ const Drawer = () => {
             path: '/comparison',
             disabled: true
         },
-        {
-            name: 'Support',
-            icon: <IoHelp/>,
-            path: '/support',
-            disabled: true
-        },
+        // {
+        //     name: 'Support',
+        //     icon: <IoHelp/>,
+        //     path: '/support',
+        //     disabled: true
+        // },
         {
             name: 'Setting',
             icon: <IoSettingsOutline/>,
@@ -74,9 +74,6 @@ const Drawer = () => {
 
     return (
         <>
-            <div className='pageTitle'>
-                {getPageTitle()}
-            </div>
             <div className='drawer drawer-mobile flex'>
                 {user && <div className='drawer-side'>
                     <label htmlFor='my-drawer-2' className='drawer-overlay'></label>

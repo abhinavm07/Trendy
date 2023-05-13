@@ -39,7 +39,6 @@ const User = () => {
     return <Spinner />
   }
 
-  console.log(twtUser?.userData?.data?.name)
   return (
     <>
       <div className=' w-full h-full'>

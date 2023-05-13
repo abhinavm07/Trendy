@@ -7,11 +7,12 @@ const trendStatic = require("../model/trendStatic");
 
 const client = new TwitterApi(`${process.env.BEARER_KEY}`);
 
+const twitterClient = require("./dataFetcher");
+
 const { tweetsSentiment } = require("../controllers/sentimentAnalysis");
 
 const getSentiment = tweetsSentiment;
 
-const v1Client = client.v1;
 const trendsV1 = async (req, res) => {
   const id = req.body.woeid;
   const { trendID } = req.body;
@@ -19,7 +20,7 @@ const trendsV1 = async (req, res) => {
   let trendStaticData;
   try {
     if (!trendID) {
-      trendsOfNy = await v1Client.trendsByPlace(Number(id));
+      trendsOfNy = await twitterClient("v1", "trendsByPlace", Number(id));
       trendStaticData = await trendStatic.create({
         data: trendsOfNy,
       });
@@ -56,7 +57,11 @@ const nearMeT = async (req, res, next) => {
       const trends = await client.v1.trendsClosest(lat, long);
       const woeid = trends[0]["woeid"];
 
-      const trendsColec = await v1Client.trendsByPlace(Number(woeid));
+      const trendsColec = await twitterClient(
+        "v1",
+        "trendsByPlace",
+        Number(woeid)
+      );
       let trendColec = [];
       for (const { trends, created_at } of trendsColec) {
         for (const trend of trends) {
@@ -133,6 +138,8 @@ const trendsCountry = async (req, res) => {
   for (const { name, country, woeid } of currentTrends) {
     availableTrends.push({ name: name, country: country, woeid: woeid });
   }
+  //sort by name
+  availableTrends.sort((a, b) => (a.name > b.name ? 1 : -1));
   res.json(availableTrends);
 };
 

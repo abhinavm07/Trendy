@@ -8,7 +8,7 @@ const getTrendCountries = async (token) => {
             Authorization: `Bearer ${token}`,
         },
     }
-    const response = await axios.get(`${API_URL}availableCountry`, {}, config)
+    const response = await axios.get(`${API_URL}availableCountry`, config)
     return response.data
 }
 

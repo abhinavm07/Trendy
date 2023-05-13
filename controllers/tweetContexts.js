@@ -12,7 +12,7 @@ const tweetContext = (tweets, id) => {
   return contextByID;
 };
 
-const contextVol = (annots) => {
+const calculateVolume = (annots) => {
   let contextVols = {};
   annots.forEach((element) => {
     contextVols[element] = (contextVols[element] || 0) + 1;
@@ -20,4 +20,12 @@ const contextVol = (annots) => {
   return contextVols;
 };
 
-module.exports = { tweetContext, contextVol };
+const arrayValue = (contextVolume) => {
+  let arrayValue = [];
+  const newArray = Object.entries(contextVolume).flatMap(([index, value]) =>
+    arrayValue.push(index)
+  );
+  return arrayValue;
+};
+
+module.exports = { tweetContext, calculateVolume, arrayValue };

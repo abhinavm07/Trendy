@@ -3,7 +3,7 @@ import {IoClose} from "react-icons/all.js";
 import {Tooltip} from "react-tooltip";
 
 export default function ActionBox({settings}) {
-    const {visible, parentId, position, onOpen, extraOptions, onClose} = settings;
+    const {visible, parentId, position, onOpen, extraOptions, onClose, content} = settings;
     //find the parent element in the DOM
     const parent = document.getElementById(parentId);
     //find the position of the parent element
@@ -21,12 +21,15 @@ export default function ActionBox({settings}) {
 
     return (
         <div className='action-box-container' style={containerStyle}>
-            <div className='action-box'>
+            <div className='action-box flex flex-col'>
                 <div className='action-box-header'>
                     <span className='float-right p-2 cursor-pointer' onClick={onClose} id='close'><IoClose/></span>
                 </div>
+                <div className='action-box-body p-2'>
+                    {content}
+                </div>
                 <div className='ActionBar'>
-                    {Object.keys(extraOptions).map((option, index) => {
+                    {extraOptions && Object.keys(extraOptions).map((option, index) => {
                         return (
                             <div className='action-box-option' key={index}>
                                 <button className='action-box-button float-right' onClick={extraOptions[option].action} id={'action_'+index}>

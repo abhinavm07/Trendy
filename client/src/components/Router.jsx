@@ -7,6 +7,7 @@ import Home from "../pages/Home.jsx";
 import ComparingUsers from "../pages/ComparingUsers.jsx";
 import UserAnalytics from "../pages/UserAnalytics.jsx";
 import UnderConstruction from "./UnderConstruction.jsx";
+import Favourites from "../pages/Favourites.jsx";
 
 export default function Router() {
     return (<Routes>
@@ -18,6 +19,7 @@ export default function Router() {
         </Route>
         <Route path='/trackuser' element={<TrackUser/>}/>
         <Route path='/sentiment' element={<Home/>}/>
+        <Route path='/favourites' element={<Favourites/>}/>
 
         <Route path='/register' element={<LoginRegister/>}/>
         <Route path='/comparison' element={<ComparingUsers/>}/>

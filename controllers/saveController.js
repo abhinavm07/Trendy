@@ -10,7 +10,6 @@ const saveTweets = asyncHandler(async (req, res) => {
     throw new Error("Please Include all fileds");
   }
 
-  console.log(createdBy, tweetID, tweetData);
   // //find one where isDeleted is null
   if (tweetID) {
     const savedTweetExists = await savedTweetsSchema.findOne({
@@ -31,7 +30,6 @@ const saveTweets = asyncHandler(async (req, res) => {
     tweetID,
     deletedAt,
   });
-  console.log(savedTweetExists);
 
   if (savedTweetExists) {
     res.status(201).json({
@@ -54,7 +52,6 @@ const deleteTweet = async (req, res) => {
     createdBy: createdBy,
   });
   if (savedTweetExists["isDeleted"] === true) {
-    console.log("Here");
     res.status(400).json({
       msg: `Tweet with the ID of : ${savedID} has already been deleted !`,
     });
@@ -87,10 +84,10 @@ const addDataTweet = async (req, res) => {
 
 const retrieveTweets = async (req, res) => {
   const { userID } = req.body;
-  const savedTweetExists = await savedTweetsSchema.find({ createdBy: userID });
+  const savedTweets = await savedTweetsSchema.find({ createdBy: userID });
   res
     .status(200)
-    .json({ msg: savedTweetExists, dataHits: savedTweetExists.length });
+    .json(savedTweets);
 };
 
 const savedTweets = async (req, res) => {
@@ -98,13 +95,11 @@ const savedTweets = async (req, res) => {
   //check if chartid for userid exists and isDeleted null
   const { userID, savedID, isDeleted } = req.body;
   if (userID && savedID && !isDeleted) {
-    console.log("ÏN");
     const savedTweetExists = await savedTweetsSchema.findOne({ _id: savedID });
     if (savedTweetExists["createdBy"] == userID) {
       res.status(200).json(savedTweetExists);
     }
   }
-  console.log(userID, savedID, isDeleted);
 };
 
 // const unsaveTweet = async (req, res) => {

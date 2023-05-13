@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
-const savedSchema = mongoose.Schema(
+const savedChartSchema = mongoose.Schema(
   {
     createdBy: { type: String, required: [true, "No username available"] },
     chartsOptions: {
-      type: Array,
+      type: String,
       required: [true, "No options available"],
     },
     data: { type: Array, required: [true, "data unavailable"] },
@@ -22,4 +22,4 @@ const savedSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("saved_charts", savedSchema);
+module.exports = mongoose.model("saved_charts", savedChartSchema);

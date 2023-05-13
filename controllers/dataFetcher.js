@@ -3,6 +3,8 @@ const { TwitterApi } = require("twitter-api-v2");
 const client = new TwitterApi(`${process.env.BEARER_KEY}`);
 const fs = require("fs");
 const path = require("path");
+const { CACHE_TTL, CACHE_ENABLED = false } = process.env;
+const crypto = require("crypto");
 
 /**
  * Fetches data from twitter api
@@ -19,45 +21,47 @@ async function twitterClient(
   options = {}
 ) {
   if (!endPoint) return "No endpoint specified.";
-  const cache = fetchCache(apiVersion, endPoint);
-
-  if (cache.length > 0) {
-    return cache;
-  }
-
   const version = apiVersion == "v2" ? client.v2 : client.v1;
+  const hashFunc = crypto.createHash("sha256");
+  hashFunc.update(`${apiVersion}_${endPoint}_${body}`);
+  const finalHash = hashFunc.digest("hex");
 
+  const cacheName = `${finalHash}.json`;
+
+  if (CACHE_ENABLED) {
+    const cache = fetchCache(cacheName);
+    if (cache) {
+      return cache;
+    }
+  }
   const response = await version[endPoint](body, options);
-  saveCache(version, endPoint, response);
+  if (CACHE_ENABLED) {
+    saveCache(cacheName, response);
+  }
   return response;
 }
 
 /**
  * fetches cache
- * @param version
- * @param endPoint
- * @returns {Buffer|*[]}
+ * @param cacheName
+ * @returns {boolean}
  */
-function fetchCache(version, endPoint) {
-  console.log("fetching cache", version);
-  const hasCache = checkCacheFolder(version, endPoint);
-  if (!hasCache) return [];
-  const cacheFile = path.join(__dirname, `${version}_${endPoint}.json`);
+function fetchCache(cacheName) {
+  const hasCache = checkCacheFolder(cacheName);
+  if (!hasCache) return false;
+  const cacheFile = path.join(__dirname, `../cache/${cacheName}`);
   const cache = fs.readFileSync(cacheFile);
-  return cache;
+  return JSON.parse(cache.toString());
 }
 
 /**
  * checks if cache folder exists
- * @param version
- * @param endPoint
+ * @param cacheName
  * @returns {boolean}
  */
-function checkCacheFolder(version, endPoint) {
-  console.log("checking cache folder");
-  const cacheFolderPath = path.join(__dirname, "cache"); // define the path to the cache folder
-  const cacheFile = path.join(__dirname, `${version}_${endPoint}.json`);
-  console.log(cacheFolderPath);
+function checkCacheFolder(cacheName) {
+  const cacheFolderPath = path.join(__dirname, "../cache"); // define the path to the cache folder
+  const cacheFile = path.join(__dirname, `../cache/${cacheName}`);
   if (!fs.existsSync(cacheFolderPath)) {
     fs.mkdirSync(cacheFolderPath);
     console.log("Cache folder created successfully");
@@ -65,23 +69,39 @@ function checkCacheFolder(version, endPoint) {
   }
 
   if (!fs.existsSync(cacheFile)) {
-    fs.writeFileSync(cacheFile, { recursive: true });
+    fs.writeFileSync(cacheFile, JSON.stringify([]));
     return false;
   }
+
+  //if file content is [] return false
+  const cache = fs.readFileSync(cacheFile);
+  if (cache.toString() === "[]") {
+    return false;
+  }
+  //get created time of file
+  const { birthtime } = fs.statSync(cacheFile);
+  const now = new Date();
+  const diff = now - birthtime;
+  const diffInHours = diff / (1000 * 60 * 60);
+  if (diffInHours > CACHE_TTL) {
+    console.log(`Cache expired ${cacheName}`);
+    fs.unlinkSync(cacheFile);
+
+    return false;
+  }
+
   return true;
 }
 
 /**
  * saves cache
- * @param version
- * @param endPoint
+ * @param cacheName
  * @param response
  */
-function saveCache(version, endPoint, response) {
-  console.log("response ", response);
-  const cacheFile = path.join(__dirname, `cache/${version}_${endPoint}.json`);
+function saveCache(cacheName, response) {
+  const cacheFile = path.join(__dirname, `../cache/${cacheName}`);
   fs.writeFileSync(cacheFile, JSON.stringify(response));
-  console.log(`Cache saved successfully ${version}_${endPoint}`);
+  console.log(`Cache saved successfully ${cacheName}`);
 }
 
 module.exports = twitterClient;

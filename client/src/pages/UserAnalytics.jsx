@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react'
+import React, {useState, useEffect} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
 import {twtUsers, reset} from '../features/tweetOfUser/tweetOfUserSlice'
 import Spinner from '../components/Spinner'
@@ -9,6 +9,9 @@ import SearchBar from "../components/SearchBar.jsx";
 import {Tooltip} from 'react-tooltip'
 import Modal from "../components/Modal.jsx";
 import {Charts} from "../components/Charts.jsx";
+import {IoSave} from "react-icons/io5";
+import TweetBox from "../components/TweetBox.jsx";
+import {saveTweet} from "../features/favourites/favouriteSlice.js";
 
 
 const UserAnalytics = () => {
@@ -18,12 +21,7 @@ const UserAnalytics = () => {
 
     const {twtUsername} = formData
     const dispatch = useDispatch()
-
-    const [tweetContextModal, setTweetContextModal] = useState({
-        visible: false,
-        title: '',
-        body: '',
-    });
+    const [isSaving, setIsSaving] = useState(false)
 
     const [tweetBreakdownModal, setTweetBreakdownModal] = useState({
         visible: false,
@@ -34,11 +32,11 @@ const UserAnalytics = () => {
     const {twtUser, isLoading, isError, isSuccess, message} = useSelector(
         (state) => state.tweetuser
     )
+
     useEffect(() => {
         if (isError) {
             toast.error(message)
         }
-
         dispatch(reset())
     }, [dispatch, isError, message])
 
@@ -53,20 +51,9 @@ const UserAnalytics = () => {
             [e.target.name]: e.target.value,
         }))
     }
+
     if (isLoading) {
         return <Spinner/>
-    }
-
-    function getClassName(sentiment = 'neutral') {
-        return `tweetbox sentiment-${sentiment}`;
-    }
-
-    function openTweetContext(tweet) {
-        setTweetContextModal({
-            visible: tweet?.context ? true : false,
-            title: 'Tweet Context',
-            body: tweet?.context?.toString(),
-        });
     }
 
     function getBreakdownChart(tweets) {
@@ -75,17 +62,33 @@ const UserAnalytics = () => {
         const extraOptions = {
             height: '400',
             width: '700',
+            canSave: true,
+            canExport: true,
         }
         const breakdownOption = {
             label: 'Breakdown',
+            chartTitle: `${twtUsername} Tweets Breakdown`,
         };
 
         return <Charts chartOptions={breakdownOption} data={tweets} extraOptions={extraOptions}/>
     }
 
+    async function saveCurrentTweet(data) {
+        setIsSaving(true);
+        const neededData = {user: twtUser?.userData?.data, tweetData: data};
+        const response = await dispatch(saveTweet(neededData))
+        setIsSaving(false);
+        const {message = ''} = response.payload;
+        if (message) {
+            toast.error(message)
+        } else {
+            toast.success('Tweet saved successfully')
+        }
+    }
 
     return (
         <>
+            {isSaving && <Spinner/>}
             <div className='sidecontainer'>
                 <SearchBar
                     onSubmit={onSubmit}
@@ -155,65 +158,8 @@ const UserAnalytics = () => {
                 }
             </div>
             {twtUser?.userData && <div className='flex flex-col'>
-                <div>
-                    <br/>
-                    <div className='w-full flex '>
-                    </div>
-                    {/* end of avatar  */}
-                    <br/>
-                    <div className='user-tweet-details'>
-                        <div className='flex '>
-                        </div>
-                        <div className='recent-tweets'>
-                            <div className='justify-center'>
-                                <div className='carousel carousel-vertical rounded-box all-tweet-list'>
-                                    {twtUser?.twtData?.map((data, index) => (
-                                        <div className='carousel-item recent-tweet' key={index}>
-                                            <div className={getClassName(data.sentiment)}>
-                                                <div className='warning-banner'>
-                                                    <div
-                                                        className='flex justify-center items-center h-10 w-full my-10'
-                                                        id={index + "_tweet-sentiment"}
-                                                    >
-                                                        <SentimentSearchResults emotion={data.sentiment} key={data.id}/>
-                                                    </div>
-                                                </div>
-                                                {/*<Tooltip anchorId={index + '_tweet-sentiment'}*/}
-                                                {/*         content={'Sentiment of this tweet is ' + data.sentiment}*/}
-                                                {/*/>*/}
-                                                <div className='avatar-username'>
-                                                    <div className='avatar'>
-                                                        <img
-                                                            src='https://www.pngall.com/wp-content/uploads/12/Avatar-Profile-Vector.png'/>
-                                                    </div>
-                                                    <div className='username-box'>
-                                                <span className='name'>
-                                                 {twtUser?.userData?.data?.name}
-                                                </span>
-                                                        <p className='username'>
-                                                            {twtUser?.userData?.data?.username}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className='tweet'
-                                                     onClick={() => openTweetContext(data)}>
-                                                    <span id={index + "_tweet-context"}>{data.tweet}</span>
-                                                </div>
-                                                {<Tooltip anchorId={index + '_tweet-context'}
-                                                          content={data?.context ? 'Click to see the tweet context' : 'No context available'}/>}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <TweetBox content={twtUser} onSave={saveCurrentTweet}/>
             </div>
-            }
-            {
-                tweetContextModal.visible &&
-                <Modal context={tweetContextModal} close={() => setTweetContextModal({visible: false})}/>
             }
             {
                 tweetBreakdownModal.visible &&

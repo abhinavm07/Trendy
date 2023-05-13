@@ -6,9 +6,9 @@ const SentimentSearchResults = ({emotion}) => {
         switch (emotion?.toString()?.toUpperCase()) {
             case 'POSITIVE':
                 return positiveSentiment;
-            case 'Neutral':
+            case 'NEUTRAL':
                 return neutralSentiment;
-            case 'Negative':
+            case 'NEGATIVE':
                 return negativeSentiment;
             default:
                 return <></>;

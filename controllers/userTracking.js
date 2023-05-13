@@ -1,5 +1,5 @@
 const trackingSchema = require("../model/trackUserSchema");
-const { contextVol } = require("../controllers/tweetContexts");
+const { calculateVolume } = require("../controllers/tweetContexts");
 
 const userTracking = async (user, sysUsername, tweetsColec) => {
   let userAnnotes = [];
@@ -48,7 +48,7 @@ const userTracking = async (user, sysUsername, tweetsColec) => {
       userAnnotes.push(element["context"]);
     }
   });
-  const contextVolume = contextVol(userAnnotes.flat());
+  const contextVolume = calculateVolume(userAnnotes.flat());
   const appendUserData = await trackingSchema.findOneAndUpdate(
     {
       trackedBy: sysUsername,
@@ -79,10 +79,8 @@ const suspendTracking = async (req, res) => {
     trackedBy: userID,
     trackedUser: trackedUser,
   });
-  console.log(trackedDataExists);
   if (trackedDataExists) {
     if (trackedDataExists["trackingStatus"] === false) {
-      console.log("Here");
       return res.status(400).json({
         msg: `Tracked Data with the ID of : ${JSON.stringify(
           trackedDataExists["_id"]
@@ -122,10 +120,8 @@ const changeTrackStatus = async (req, res) => {
     });
   }
 
-  console.log(trackedDataExists);
   if (trackedDataExists) {
     if (trackedDataExists["trackingStatus"] == status) {
-      console.log("Here");
       return res.status(400).json({
         msg: `Tracked Status is already ${status}`,
       });

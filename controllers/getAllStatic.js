@@ -2,17 +2,21 @@ const staticAPI = require("../model/staticAPIdata");
 
 const { tweetsSentiment } = require("../controllers/sentimentAnalysis");
 
-const { tweetContext, contextVol } = require("../controllers/tweetContexts");
+const {
+  tweetContext,
+  calculateVolume,
+  arrayValue,
+} = require("../controllers/tweetContexts");
 
 const cleanData = require("../model/cleanData");
 
 const getID = async () => {
   let idList = [];
-  let staticData = await staticAPI.find({});
+  const staticData = await staticAPI.find({});
+  // console.log(staticData);
   staticData.forEach((element) => {
     idList.push(JSON.stringify(element["_id"]).replace(/['"]+/g, ""));
   });
-
   const update = cleanStatic(idList);
 };
 
@@ -22,6 +26,7 @@ const cleanStatic = async (idList) => {
   let userTweets;
   let userData;
   let staticData;
+  // console.log(idList);
   for (const staticID of idList) {
     let tweetsColec = [];
     staticData = await staticAPI.findById({ _id: staticID });
@@ -36,33 +41,34 @@ const cleanStatic = async (idList) => {
       if (userTweets) {
         let twtData = userTweets["_realData"]["data"];
         for (const twt of twtData) {
-          const id = twt["id"];
-          const twtSentiment = await tweetsSentiment(twt["text"]);
-          const annotations = twt["context_annotations"];
-          if (annotations) {
-            const context = tweetContext(annotations, id);
-            userAnnotes.push(context[id]);
-            tweetsColec.push({
-              id: twt["id"],
-              tweet: twt["text"],
-              sentiment: twtSentiment,
-              context: context[id],
-            });
-          } else {
-            tweetsColec.push({
-              id: twt["id"],
-              tweet: twt["text"],
-              sentiment: twtSentiment,
-            });
+          if (twt) {
+            const id = twt["id"];
+            const twtSentiment = await tweetsSentiment(twt["text"]);
+            const annotations = twt["context_annotations"];
+            if (annotations) {
+              const context = tweetContext(annotations, id);
+              userAnnotes.push(context[id]);
+              tweetsColec.push({
+                id: twt["id"],
+                tweet: twt["text"],
+                sentiment: twtSentiment,
+                context: context[id],
+              });
+            } else {
+              tweetsColec.push({
+                id: twt["id"],
+                tweet: twt["text"],
+                sentiment: twtSentiment,
+              });
+            }
           }
         }
-        const contextVolume = await contextVol(userAnnotes.flat());
+        const contextVolume = await calculateVolume(userAnnotes.flat());
         appendingData(user, tweetsColec);
       }
     }
   }
 
-  console.log("Success");
 };
 
 const appendingData = async (user, tweetsColec) => {
@@ -102,18 +108,25 @@ const appendingData = async (user, tweetsColec) => {
       userAnnotes.push(element["context"]);
     }
   });
-  const contextVolume = contextVol(userAnnotes.flat());
+  const contextVolume = calculateVolume(userAnnotes.flat());
+  const contextValues = arrayValue(contextVolume);
   const appendUserData = await cleanData.findOneAndUpdate(
     {
       twitterUser: user["data"]["username"],
     },
-    { contextVolume: contextVolume }
+    { $set: { contextVolume: contextVolume, contextValue: contextValues } }
   );
 };
 
 const retriveStatic = async (req, res) => {
-  const staticData = await staticAPI.find({});
-  res.status(200).json({ data: staticData, hits: staticData.length });
+  const { id } = req.body;
+  const staticData = await staticAPI.findById({ _id: id });
+  if (staticData) {
+    res.status(200).json({ data: staticData, hits: staticData.length });
+  } else {
+    console.log("No Such Data");
+  }
 };
 
+// getID();
 module.exports = { getID, retriveStatic };

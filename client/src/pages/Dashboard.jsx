@@ -8,6 +8,7 @@ import {
     getTrends,
     getNearMeT, resetNearTrends
 } from '../features/trends/trendSlice.js'
+
 import {toast} from "react-toastify";
 import Spinner from "../components/Spinner.jsx";
 import SearchBar from "../components/SearchBar.jsx";
@@ -176,13 +177,13 @@ const DashBoard = () => {
         identifier: 'trend',
         dataKey: 'volumn',
         label: 'Trending',
+        chartTitle: `Trending in ${countryName}`,
     };
 
     const extraOptions = {
         width: '100px',
         height: '40%',
         canExport: true,
-        canShare: true,
         canSave: true,
     }
 
@@ -204,7 +205,7 @@ const DashBoard = () => {
             <div className='countryDropdownBox float-right mb-10'>
                 <select className='input input-bordered' onChange={changeCountry} defaultValue={selectedCountry}
                         onClick={checkCountry}>
-                    <option value=''>Select Country</option>
+                    <option value=''>Select Area</option>
                     {isLoadingCountry && <option value=''>Loading...</option>}
                     {countries && Object.values(countries).map((country, index) => (
                         <option key={index} value={country['woeid']}>{country['name']}</option>
