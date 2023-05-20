@@ -10,7 +10,7 @@ export default function Favourites() {
     const tabs = [
         {
             name: 'All Saved',
-            content: 'All your favourites in one place',
+            content: 'All your saved items in one place',
             dataKey: 'all'
         },
         {
@@ -25,7 +25,7 @@ export default function Favourites() {
         },
         {
             name: 'Shared',
-            content: '',
+            content: 'Shared with you',
             dataKey: 'shared'
         }
     ];

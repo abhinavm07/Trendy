@@ -1,6 +1,6 @@
 import {IoGitCompare, IoHappy, IoHelp, IoHome, IoSave, IoSettingsOutline} from 'react-icons/io5'
 import {useSelector} from "react-redux";
-import {ImUser, IoMdAnalytics} from "react-icons/all.js";
+import {ImEye, ImUser, IoMdAnalytics} from "react-icons/all.js";
 import Navigation from "./Navigation.jsx";
 import Router from "./Router.jsx";
 import {useState} from "react";
@@ -8,6 +8,10 @@ import {useLocation} from "react-router-dom";
 
 const Drawer = () => {
     const {user} = useSelector((state) => state.auth)
+    let isAdmin = false;
+    if (user) {
+        isAdmin = user.isAdmin;
+    }
     const sideBar = [
         {
             name: 'Dashboard',
@@ -20,7 +24,7 @@ const Drawer = () => {
             path: '/analytics'
         },
         {
-            name: 'Favourites',
+            name: 'Saved',
             icon: <IoSave/>,
             path: '/favourites'
         },
@@ -30,16 +34,14 @@ const Drawer = () => {
             path: '/sentiment'
         },
         {
-            name: 'Track User',
-            icon: <ImUser/>,
-            path: '/trackuser',
-            disabled: true
+            name: 'Watchlist',
+            icon: <ImEye/>,
+            path: '/watchlist',
         },
         {
             name: 'Comparison',
             icon: <IoGitCompare/>,
             path: '/comparison',
-            disabled: true
         },
         // {
         //     name: 'Support',
@@ -51,7 +53,7 @@ const Drawer = () => {
             name: 'Setting',
             icon: <IoSettingsOutline/>,
             path: '/setting',
-            disabled: true
+            hidden: !isAdmin
         }
     ];
     const location = useLocation();
@@ -59,7 +61,7 @@ const Drawer = () => {
     function getPageTitle() {
         const path = location.pathname;
 
-        if(location.pathname == '' || location.pathname == '/'){
+        if (location.pathname == '' || location.pathname == '/') {
             return 'Dashboard'
         }
         //from sideBar array find the object with the path that matches the current path

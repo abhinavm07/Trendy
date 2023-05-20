@@ -8,8 +8,16 @@ import ComparingUsers from "../pages/ComparingUsers.jsx";
 import UserAnalytics from "../pages/UserAnalytics.jsx";
 import UnderConstruction from "./UnderConstruction.jsx";
 import Favourites from "../pages/Favourites.jsx";
+import Watchlist from "../pages/Watchlist.jsx";
+import Settings from "../pages/Setting.jsx";
+import {useSelector} from "react-redux";
 
 export default function Router() {
+    const {user} = useSelector((state) => state.auth)
+    let isAdmin = false;
+    if (user) {
+        isAdmin = user.isAdmin;
+    }
     return (<Routes>
         <Route path='/login' element={<LoginRegister/>}/>
         <Route path='' element={<DashBoard/>}/>
@@ -20,11 +28,12 @@ export default function Router() {
         <Route path='/trackuser' element={<TrackUser/>}/>
         <Route path='/sentiment' element={<Home/>}/>
         <Route path='/favourites' element={<Favourites/>}/>
+        <Route path='/watchlist' element={<Watchlist/>}/>
 
         <Route path='/register' element={<LoginRegister/>}/>
+        <Route path='/forgot' element={<LoginRegister/>}/>
         <Route path='/comparison' element={<ComparingUsers/>}/>
         <Route path='/analytics' element={<UserAnalytics/>}/>
-        <Route path='/support' element={<UnderConstruction/>}/>
-        <Route path='/setting' element={<UnderConstruction/>}/>
+        {isAdmin && <Route path='/setting' element={<Settings/>}/>}
     </Routes>);
 }

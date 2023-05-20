@@ -43,6 +43,16 @@ export const login = createAsyncThunk('auth/login', async (user, thunkAPI) => {
   }
 })
 
+export const forgotPassword = createAsyncThunk('auth/forgot', async (email, thunkAPI) => {
+  try {
+    return await authService.forgotPassword(email)
+  } catch (error) {
+    const message =
+        error?.response?.data || error.message || error.toString();
+    return thunkAPI.rejectWithValue(message);
+  }
+})
+
 //Logout User
 
 export const logout = createAsyncThunk('auth/logout', async () => {

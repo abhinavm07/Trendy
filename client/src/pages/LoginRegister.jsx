@@ -1,10 +1,15 @@
 import Login from "./components/Login.jsx";
 import Register from "./components/Register.jsx";
+import ForgotPassword from "./components/ForgotPassword.jsx";
 
 export default function LoginRegister () {
 
     function isLoginRoute() {
         return window.location.pathname === '/login';
+    }
+
+    function isForgotPasswordRoute() {
+        return window.location.pathname === '/forgot';
     }
 
 return (
@@ -14,7 +19,7 @@ return (
             </div>
             <div className="form-right">
                 {
-                    isLoginRoute() ? <Login /> : <Register />
+                    isForgotPasswordRoute() ? <ForgotPassword /> : isLoginRoute() ? <Login /> : <Register />
                 }
             </div>
         </div>

@@ -12,12 +12,19 @@ import {Charts} from "../components/Charts.jsx";
 import {IoSave} from "react-icons/io5";
 import TweetBox from "../components/TweetBox.jsx";
 import {saveTweet} from "../features/favourites/favouriteSlice.js";
+import {addTrack} from "../features/tracking/trackingSlice.js";
 
 
 const UserAnalytics = () => {
     const [formData, setFormData] = useState({
         twtUsername: '',
     })
+    const {twtUser, isLoading, isError, isSuccess, message} = useSelector(
+        (state) => state.tweetuser
+    )
+
+    const [isTracked, setIsTracked] = useState(false);
+
 
     const {twtUsername} = formData
     const dispatch = useDispatch()
@@ -29,9 +36,6 @@ const UserAnalytics = () => {
         body: '',
     });
 
-    const {twtUser, isLoading, isError, isSuccess, message} = useSelector(
-        (state) => state.tweetuser
-    )
 
     useEffect(() => {
         if (isError) {
@@ -40,10 +44,12 @@ const UserAnalytics = () => {
         dispatch(reset())
     }, [dispatch, isError, message])
 
-    const onSubmit = (e) => {
+
+    const onSubmit = async (e) => {
         e.preventDefault()
         const twtuserName = {twtUsername}
-        dispatch(twtUsers(twtuserName))
+        const result = await dispatch(twtUsers(twtuserName))
+        setIsTracked(result.payload?.isTracked || false)
     }
     const onChange = (e) => {
         setFormData((prevstate) => ({
@@ -86,6 +92,16 @@ const UserAnalytics = () => {
         }
     }
 
+    const handleTrackChange = async (event) => {
+        setIsTracked(event.target.checked);
+        const result = await dispatch(addTrack(twtUser))
+        const {msg = '', status = 'success'} = result.payload;
+        if (status === 'error') {
+            setIsTracked(false);
+        }
+        toast[status](msg || 'You are now watching this user.')
+    }
+
     return (
         <>
             {isSaving && <Spinner/>}
@@ -103,7 +119,7 @@ const UserAnalytics = () => {
                     buttonIcon={<IoSearch/>}
                 />
                 {twtUser?.userData && <div className='meta-user-details'>
-                    <div className='grid grid-cols-4 gap-4 mt-2'>
+                    <div className='grid grid-cols-5 gap-5 mt-2'>
                         <div className='col-span-1'>
                             <div className='flex flex-col meta-user-info'>
                                 Followers
@@ -124,8 +140,13 @@ const UserAnalytics = () => {
                                 Breakdown
                             </div>
                         </div>
+                        <div className='col-span-1'>
+                            <div className='flex flex-col meta-user-info'>
+                                Track User
+                            </div>
+                        </div>
                     </div>
-                    <div className='grid grid-cols-4 gap-4 mt-2'>
+                    <div className='grid grid-cols-5 gap-5 mt-2'>
                         <div className='col-span-1'>
                             <div className='flex flex-col user-detail-small'>
                                 {twtUser?.userData?.data?.public_metrics?.followers_count}
@@ -152,6 +173,17 @@ const UserAnalytics = () => {
                             </div>
                             <Tooltip anchorId='tweet-breakdown-chart-tooltip'
                                      content='Click here to see the tweet breakdown'/>
+                        </div>
+                        <div className='col-span-1'>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox"
+                                       className='cursor-pointer'
+                                       checked={isTracked}
+                                       onChange={handleTrackChange}
+                                       disabled={isTracked}
+                                />
+
+                            </label>
                         </div>
                     </div>
                 </div>

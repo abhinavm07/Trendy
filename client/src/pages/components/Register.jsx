@@ -21,6 +21,7 @@ function Register() {
     const {user, isLoading, isError, isSuccess, message} = useSelector(
         (state) => state.auth
     )
+    const [passwordStrength, setPasswordStrength] = useState('')
 
     useEffect(() => {
         if (isError) {
@@ -34,6 +35,60 @@ function Register() {
     }, [dispatch, isError, isSuccess, message, navigate, user])
 
     const onChange = (e) => {
+        if (['password', 'password2'].includes(e.target.name)) {
+            setPasswordStrength(checkPasswordStrength(e.target.value));
+        }
+        setLoginFormData(e)
+    }
+
+    function checkPasswordStrength(password) {
+        // Define the criteria for password strength
+        const minLength = 8; // Minimum password length
+        const minLowercase = 1; // Minimum lowercase characters
+        const minUppercase = 1; // Minimum uppercase characters
+        const minNumbers = 1; // Minimum numeric characters
+        const minSpecialChars = 1; // Minimum special characters
+
+        // Check the password against the criteria
+        const lowercaseRegex = /[a-z]/g;
+        const uppercaseRegex = /[A-Z]/g;
+        const numbersRegex = /[0-9]/g;
+        const specialCharsRegex = /[!@#$%^&*(),.?":{}|<>]/g;
+
+        const isLengthValid = password.length >= minLength;
+        const isLowercaseValid = (password.match(lowercaseRegex) || []).length >= minLowercase;
+        const isUppercaseValid = (password.match(uppercaseRegex) || []).length >= minUppercase;
+        const isNumbersValid = (password.match(numbersRegex) || []).length >= minNumbers;
+        const isSpecialCharsValid = (password.match(specialCharsRegex) || []).length >= minSpecialChars;
+
+        // Determine the password strength
+        if (isLengthValid && isLowercaseValid && isUppercaseValid && isNumbersValid && isSpecialCharsValid) {
+            return 'Strong';
+        } else if (isLengthValid && (isLowercaseValid || isUppercaseValid || isNumbersValid || isSpecialCharsValid)) {
+            return 'Moderate';
+        } else {
+            let errorMessage = 'Password must include:';
+            if (!isLengthValid) {
+                errorMessage += ' at least ' + minLength + ' characters';
+            }
+            if (!isLowercaseValid) {
+                errorMessage += ', lowercase characters';
+            }
+            if (!isUppercaseValid) {
+                errorMessage += ', uppercase characters';
+            }
+            if (!isNumbersValid) {
+                errorMessage += ', numeric characters';
+            }
+            if (!isSpecialCharsValid) {
+                errorMessage += ', special characters';
+            }
+            return errorMessage;
+        }
+    }
+
+
+    function setLoginFormData(e) {
         setFormData((prevstate) => ({
             ...prevstate,
             [e.target.name]: e.target.value,
@@ -46,8 +101,13 @@ function Register() {
         if (password !== password2) {
             toast.error('Passwords do not match')
         } else {
-            const userData = {name, email, password}
-            dispatch(register(userData))
+            if (!['Strong', 'Moderate'].includes(passwordStrength)) {
+                toast.error('Password is too weak.')
+                return;
+            } else {
+                const userData = {name, email, password}
+                dispatch(register(userData))
+            }
         }
     }
 
@@ -84,6 +144,12 @@ function Register() {
                         onChange={onChange}
                         placeholder='Password'
                     />
+                    <div className='text-center text-sm text-red mt-2 mb-2'>
+                        {
+                            !['Moderate', 'Strong'].includes(passwordStrength) &&
+                            <span className='text-red-500'>{passwordStrength}</span>
+                        }
+                    </div>
                     <input
                         type='password'
                         className='block border border-grey-light w-full p-3 rounded mb-4'

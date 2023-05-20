@@ -1,328 +1,149 @@
-import React from 'react'
+import React, {useState} from 'react'
+import SearchBar from "../components/SearchBar.jsx";
+import {IoSearch} from "react-icons/all.js";
+import Table from "../components/Table.jsx";
+import {Charts} from "../components/Charts.jsx";
+import {useDispatch} from "react-redux";
+import {compareUsers} from "../features/compareUsers/compareUsersSlice.js";
+import Spinner from "../components/Spinner.jsx";
 
 const ComparingUsers = () => {
-  return (
-    <>
-      <div className='w-full flex '>
-        <h1 className=' items-start font-extrabold text-5xl'>
-          comparison Users
-        </h1>
-      </div>
+    const [users, setUsers] = useState({
+        userOne: '',
+        userTwo: '',
+    })
 
-      <div className='w-full flex '>
-        <p>
-          With this feature we can compare analytics of two users with each
-          other
-        </p>
-      </div>
-      <br />
-      <div className='flex justify-evenly'>
-        <div className='avatar'>
-          <div className='w-24 rounded'>
-            <img src='/images/stock/photo-1534528741775-53994a69daeb.jpg' />
-          </div>
-        </div>
-        <div className='avatar  '>
-          <div className='w-24 rounded'>
-            <img src='/images/stock/photo-1534528741775-53994a69daeb.jpg' />
-          </div>
-        </div>
-      </div>
+    const [userData, setUserData] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
 
-      <br />
-      {/* end of avatar  */}
-      <div className='flex '>
-        {/* start of first table */}
-        <div className='overflow-x-auto mx-2 '>
-          <table className='table table-compact w-full'>
-            <thead>
-              <tr>
-                <th></th>
-                <th>Name</th>
-                <th>Job</th>
-                <th>company</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>1</th>
-                <td>Cy Ganderton</td>
-                <td>Quality Control Specialist</td>
-                <td>Littel, Schaden and Vandervort</td>
-              </tr>
-              <tr>
-                <th>2</th>
-                <td>Hart Hagerty</td>
-                <td>Desktop Support Technician</td>
-                <td>Zemlak, Daniel and Leannon</td>
-              </tr>
-              <tr>
-                <th>3</th>
-                <td>Brice Swyre</td>
-                <td>Tax Accountant</td>
-                <td>Carroll Group</td>
-              </tr>
-              <tr>
-                <th>4</th>
-                <td>Marjy Ferencz</td>
-                <td>Office Assistant I</td>
-                <td>Rowe-Schoen</td>
-              </tr>
-              <tr>
-                <th>5</th>
-                <td>Yancy Tear</td>
-                <td>Community Outreach Specialist</td>
-                <td>Wyman-Ledner</td>
-              </tr>
-              <tr>
-                <th>6</th>
-                <td>Irma Vasilik</td>
-                <td>Editor</td>
-                <td>Wiza, Bins and Emard</td>
-              </tr>
-              <tr>
-                <th>7</th>
-                <td>Meghann Durtnal</td>
-                <td>Staff Accountant IV</td>
-                <td>Schuster-Schimmel</td>
-              </tr>
-              <tr>
-                <th>8</th>
-                <td>Sammy Seston</td>
-                <td>Accountant I</td>
-                <td>O'Hara, Welch and Keebler</td>
-              </tr>
-              <tr>
-                <th>9</th>
-                <td>Lesya Tinham</td>
-                <td>Safety Technician IV</td>
-                <td>Turner-Kuhlman</td>
-              </tr>
-              <tr>
-                <th>10</th>
-                <td>Zaneta Tewkesbury</td>
-                <td>VP Marketing</td>
-                <td>Sauer LLC</td>
-              </tr>
-              <tr>
-                <th>11</th>
-                <td>Andy Tipple</td>
-                <td>Librarian</td>
-                <td>Hilpert Group</td>
-              </tr>
-              <tr>
-                <th>12</th>
-                <td>Sophi Biles</td>
-                <td>Recruiting Manager</td>
-                <td>Gutmann Inc</td>
-              </tr>
-              <tr>
-                <th>13</th>
-                <td>Florida Garces</td>
-                <td>Web Developer IV</td>
-                <td>Gaylord, Pacocha and Baumbach</td>
-              </tr>
-              <tr>
-                <th>14</th>
-                <td>Maribeth Popping</td>
-                <td>Analyst Programmer</td>
-                <td>Deckow-Pouros</td>
-              </tr>
-              <tr>
-                <th>15</th>
-                <td>Moritz Dryburgh</td>
-                <td>Dental Hygienist</td>
-                <td>Schiller, Cole and Hackett</td>
-              </tr>
-              <tr>
-                <th>16</th>
-                <td>Reid Semiras</td>
-                <td>Teacher</td>
-                <td>Sporer, Sipes and Rogahn</td>
-              </tr>
-              <tr>
-                <th>17</th>
-                <td>Alec Lethby</td>
-                <td>Teacher</td>
-                <td>Reichel, Glover and Hamill</td>
-              </tr>
-              <tr>
-                <th>18</th>
-                <td>Aland Wilber</td>
-                <td>Quality Control Specialist</td>
-                <td>Kshlerin, Rogahn and Swaniawski</td>
-              </tr>
-              <tr>
-                <th>19</th>
-                <td>Teddie Duerden</td>
-                <td>Staff Accountant III</td>
-                <td>Pouros, Ullrich and Windler</td>
-              </tr>
-              <tr>
-                <th>20</th>
-                <td>Lorelei Blackstone</td>
-                <td>Data Coordiator</td>
-                <td>Witting, Kutch and Greenfelder</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <th></th>
-                <th>Name</th>
-                <th>Job</th>
-                <th>company</th>
-              </tr>
-            </tfoot>
-          </table>
+    const onChange = (e) => {
+        setUsers((prevstate) => ({
+            ...prevstate,
+            [e.target.name]: e.target.value,
+        }))
+    }
+
+    const dispatch = useDispatch();
+
+    async function onSubmit() {
+        setIsLoading(true);
+        const allUserData = await dispatch(compareUsers(users));
+
+        const brokenData = {
+            userOne: allUserData.payload[0][users.userOne] || allUserData.payload[0][users.userTwo],
+            userTwo: allUserData.payload[1][users.userTwo] || allUserData.payload[1][users.userOne]
+        }
+
+        setUserData(brokenData);
+        setIsLoading(false);
+    }
+
+    function isDisabled() {
+        return !users.userOne || !users.userTwo
+    }
+
+    function hasData() {
+        return userData && userData?.userOne && userData?.userTwo
+    }
+
+    const userOneTableConfig = {
+        data: [userData.userOne],
+        header: ['Name', 'No. of Tweets', 'Followers', 'Following', 'Context Breakdown'],
+        dataKeys: ['name', 'tweet_count', 'followers_count', 'following_count', 'context'],
+        rowType: {
+            'context': 'Chips'
+        },
+        canExport: true,
+    }
+
+    const userTwoTableConfig = {
+        data: [userData.userTwo],
+        header: ['Name','No. of Tweets', 'Followers', 'Following', 'Context Breakdown'],
+        dataKeys: ['name', 'tweet_count', 'followers_count', 'following_count', 'context'],
+        tableStyle: {
+            height: '50vh',
+            overflow: 'scroll'
+        },
+        rowType: {
+            'context': 'Chips'
+        },
+        canExport: true,
+    }
+
+    const chartData = userData;
+    const chartOptions = {
+        label: [users.userOne, users.userTwo],
+        chartTitle: `Users Comparision`,
+        isMultiple: true,
+        dataKey: ['tweet_count', 'followers_count', 'following_count'],
+        ignoreField: ['name', 'context', 'username', 'contextVolume'],
+        chartLabels: [
+            'Followers',
+            'Following',
+            'No. of Tweets',
+        ],
+    };;
+
+
+    return (
+        <div className='flex flex-col'>
+            {isLoading && <Spinner/>}
+            <div className='flex flex-col'>
+                <div>
+                    <SearchBar
+                        value={users.userOne}
+                        onChange={onChange}
+                        name='userOne'
+                        id='userOne'
+                        placeholder='First User'
+                        disabled={!users.userOne}
+                        type='text'
+                        icon='@'
+                    />
+                </div>
+                <div className=''>
+                    <SearchBar
+                        value={users.userTwo}
+                        onChange={onChange}
+                        name='userTwo'
+                        id='userTwo'
+                        placeholder='Second User'
+                        disabled={!users.userTwo}
+                        type='text'
+                        icon='@'
+                    />
+                </div>
+                <div className='ml-auto'>
+                    <button
+                        className='btn bg-transparent
+                        hover:bg-blue-500
+                        text-blue-700
+                        font-semibold
+                        hover:text-white
+                        py-2 px-4 border
+                        border-blue-500
+                        hover:border-transparent
+                        rounded' onClick={onSubmit} disabled={isDisabled()}>Compare
+                    </button>
+                </div>
+                {hasData() && <div className='m-auto chart-compare'>
+                    <h2>
+                        Comparison Chart
+                    </h2>
+                    <Charts data={chartData} chartOptions={chartOptions}
+                            extraOptions={{chartType: 'pie', canExport: true, height: 500, width: 500}}/>
+                </div>}
+                {hasData() && <div className='mt-10 flex flex-row m-auto'>
+                        <Table
+                            tableConfig={userOneTableConfig}/>
+                    <div className='ml-5'>
+                        <Table
+                            tableConfig={userTwoTableConfig}/>
+                    </div>
+                </div>}
+            </div>
         </div>
-        {/* end of first table */}
-        {/* start of second table */}
-        <div className='overflow-x-auto mx-2 '>
-          <table className='table table-compact w-full'>
-            <thead>
-              <tr>
-                <th></th>
-                <th>Name</th>
-                <th>Job</th>
-                <th>company</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>1</th>
-                <td>Cy Ganderton</td>
-                <td>Quality Control Specialist</td>
-                <td>Littel, Schaden and Vandervort</td>
-              </tr>
-              <tr>
-                <th>2</th>
-                <td>Hart Hagerty</td>
-                <td>Desktop Support Technician</td>
-                <td>Zemlak, Daniel and Leannon</td>
-              </tr>
-              <tr>
-                <th>3</th>
-                <td>Brice Swyre</td>
-                <td>Tax Accountant</td>
-                <td>Carroll Group</td>
-              </tr>
-              <tr>
-                <th>4</th>
-                <td>Marjy Ferencz</td>
-                <td>Office Assistant I</td>
-                <td>Rowe-Schoen</td>
-              </tr>
-              <tr>
-                <th>5</th>
-                <td>Yancy Tear</td>
-                <td>Community Outreach Specialist</td>
-                <td>Wyman-Ledner</td>
-              </tr>
-              <tr>
-                <th>6</th>
-                <td>Irma Vasilik</td>
-                <td>Editor</td>
-                <td>Wiza, Bins and Emard</td>
-              </tr>
-              <tr>
-                <th>7</th>
-                <td>Meghann Durtnal</td>
-                <td>Staff Accountant IV</td>
-                <td>Schuster-Schimmel</td>
-              </tr>
-              <tr>
-                <th>8</th>
-                <td>Sammy Seston</td>
-                <td>Accountant I</td>
-                <td>O'Hara, Welch and Keebler</td>
-              </tr>
-              <tr>
-                <th>9</th>
-                <td>Lesya Tinham</td>
-                <td>Safety Technician IV</td>
-                <td>Turner-Kuhlman</td>
-              </tr>
-              <tr>
-                <th>10</th>
-                <td>Zaneta Tewkesbury</td>
-                <td>VP Marketing</td>
-                <td>Sauer LLC</td>
-              </tr>
-              <tr>
-                <th>11</th>
-                <td>Andy Tipple</td>
-                <td>Librarian</td>
-                <td>Hilpert Group</td>
-              </tr>
-              <tr>
-                <th>12</th>
-                <td>Sophi Biles</td>
-                <td>Recruiting Manager</td>
-                <td>Gutmann Inc</td>
-              </tr>
-              <tr>
-                <th>13</th>
-                <td>Florida Garces</td>
-                <td>Web Developer IV</td>
-                <td>Gaylord, Pacocha and Baumbach</td>
-              </tr>
-              <tr>
-                <th>14</th>
-                <td>Maribeth Popping</td>
-                <td>Analyst Programmer</td>
-                <td>Deckow-Pouros</td>
-              </tr>
-              <tr>
-                <th>15</th>
-                <td>Moritz Dryburgh</td>
-                <td>Dental Hygienist</td>
-                <td>Schiller, Cole and Hackett</td>
-              </tr>
-              <tr>
-                <th>16</th>
-                <td>Reid Semiras</td>
-                <td>Teacher</td>
-                <td>Sporer, Sipes and Rogahn</td>
-              </tr>
-              <tr>
-                <th>17</th>
-                <td>Alec Lethby</td>
-                <td>Teacher</td>
-                <td>Reichel, Glover and Hamill</td>
-              </tr>
-              <tr>
-                <th>18</th>
-                <td>Aland Wilber</td>
-                <td>Quality Control Specialist</td>
-                <td>Kshlerin, Rogahn and Swaniawski</td>
-              </tr>
-              <tr>
-                <th>19</th>
-                <td>Teddie Duerden</td>
-                <td>Staff Accountant III</td>
-                <td>Pouros, Ullrich and Windler</td>
-              </tr>
-              <tr>
-                <th>20</th>
-                <td>Lorelei Blackstone</td>
-                <td>Data Coordiator</td>
-                <td>Witting, Kutch and Greenfelder</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <th></th>
-                <th>Name</th>
-                <th>Job</th>
-                <th>company</th>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-        {/* end of second table */}
-      </div>
-    </>
-  )
+    )
 }
 
 export default ComparingUsers

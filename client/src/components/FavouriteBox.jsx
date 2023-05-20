@@ -19,7 +19,7 @@ export default function FavouriteBox({component, contents}) {
     const isAll = dataKey === 'all';
 
     function getExtraOptions(chart) {
-        return {height: '400', width: '700', canSave: false, canExport: true, canShare: true, id: chart._id}
+        return {height: '400', width: '700', canSave: false, canExport: true, canShare: true, id: chart._id, isFromFavourites: true}
     }
 
     const [favModalSetting, setFavModalSetting] = useState({
@@ -34,13 +34,6 @@ export default function FavouriteBox({component, contents}) {
             visible: true,
             title: chartTitle,
             body: generateChart(context)
-        });
-    }
-
-        function openSavedTweet(context) {
-        setFavModalSetting({
-            visible: true,
-            body: context
         });
     }
 
@@ -62,7 +55,8 @@ export default function FavouriteBox({component, contents}) {
                     visible: false
                 })
             },
-            content: <span className='shared-subtitle'>Shared by {data?.sharedBy} on {dateToString(data.createdAt)}</span>,
+            content: <span
+                className='shared-subtitle'>Shared by {data?.sharedBy} on {dateToString(data.createdAt)}</span>,
         };
         setActionBoxSettings(settings);
     }
@@ -93,13 +87,13 @@ export default function FavouriteBox({component, contents}) {
                 }
                 {isShared && shared?.charts.map((chart) => {
                         const {savedData} = chart;
-                        return savedData.map((data, index) => {
+                        return savedData.map((data) => {
                             return <>
                                 {data?.chartsOptions &&
-                                    <div key={index} className='shared-box cursor-pointer flex flex-col p-5'
-                                         id={`sharedChart_${index}`}
+                                    <div key={data._id} className='shared-box cursor-pointer flex flex-col p-5 mr-5'
+                                         id={`sharedChart_${data._id}`}
                                          onClick={() => openSaved(data)}
-                                         onMouseEnter={() => openTrend(chart,`sharedChart_${index}`)}
+                                         onMouseEnter={() => openTrend(chart, `sharedChart_${data._id}`)}
                                          onMouseLeave={() => setActionBoxSettings({visible: false})}
                                     >
                                         <div className='fav-chart-img-box'></div>
@@ -113,33 +107,27 @@ export default function FavouriteBox({component, contents}) {
                     }
                 )}
 
-                
 
             </div>
-                                {isShared && shared?.tweets.map((tweet) => {
-                        const {savedData} =tweet;
-                        return savedData.map((data, index) => {
-                            return <>
-                                {data?.tweet &&
-                                    <div key={index} className='recent-tweet'
-                                         id={`sharedChart_${index}`}
-                                         onClick={() => openSavedTweet(data)}
-                                         onMouseEnter={() => openTrend(tweet,`sharedTweet_${index}`)}
-                                         onMouseLeave={() => setActionBoxSettings({visible: false})}
-                                    >
-                                                        <div className='justify-center'>
-                                                            <div className='carousel carousel-vertical rounded-box all-tweet-list'>
-                    <>
-                        <TweetBox content={data} canSave={false} canShare={true}/>
-                    </>
-</div>
-                                                        </div>
-                                                                            
-                                    </div>}
-                            </>
-                        })
-                    }
-                )}
+            {isShared && shared?.tweets.map((tweet) => {
+                    const {savedData} = tweet;
+                    return savedData.map((data) => {
+                        return <>
+                            {data?.tweet &&
+                                <div key={data._id} className='recent-tweet'>
+                                    <div className='justify-center'>
+                                        <div className='carousel carousel-vertical rounded-box all-tweet-list mr-5'>
+                                            <>
+                                                <TweetBox content={data} canSave={false} canShare={true}/>
+                                            </>
+                                        </div>
+                                    </div>
+
+                                </div>}
+                        </>
+                    })
+                }
+            )}
 
             {isAll && <div className='mb-10'></div>}
             {favModalSetting.visible &&

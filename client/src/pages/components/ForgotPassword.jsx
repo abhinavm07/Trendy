@@ -1,19 +1,16 @@
 import {useState, useEffect} from 'react'
-import {FaSignInAlt} from 'react-icons/fa'
 import {toast} from 'react-toastify'
 import {useNavigate, Link} from 'react-router-dom'
 import {useDispatch, useSelector} from 'react-redux'
-import {login, reset} from '../../features/auth/authSlice.js'
 import Spinner from '../../components/Spinner.jsx'
-import image from '../../assets/image.jpeg'
+import {forgotPassword} from "../../features/auth/authSlice.js";
 
-function Login() {
+function ForgotPassword() {
     const [formData, setFormData] = useState({
         email: '',
-        password: '',
     })
 
-    const {email, password} = formData
+    const {email} = formData
 
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -25,11 +22,6 @@ function Login() {
         if (isError) {
             toast.error(message)
         }
-        //Redirect when logged in
-        if (isSuccess || user) {
-            navigate('/dashboard')
-        }
-        dispatch(reset())
     }, [dispatch, isError, isSuccess, message, navigate, user])
 
     const onChange = (e) => {
@@ -39,10 +31,19 @@ function Login() {
         }))
     }
 
-    const onSubmit = (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault()
-        const userData = {email, password}
-        dispatch(login(userData))
+        const userData = {email}
+        const response = await dispatch(forgotPassword(userData))
+        if (response.payload) {
+            toast[response.payload.status](response.payload.msg)
+            //wait for 5 seconds and redirect to login page
+            if (response.payload.status === 'success') {
+                setTimeout(() => {
+                    navigate('/login')
+                }, 5000);
+            }
+        }
     }
     if (isLoading) {
         return <Spinner/>
@@ -51,7 +52,7 @@ function Login() {
     return (
         <>
             <div className='bg-white px-6 py-8 '>
-                <h1 className='mb-8 text-3xl text-center text-black '>Sign In</h1>
+                <h1 className='mb-8 text-3xl text-center text-black '>Forgot Password</h1>
                 <form onSubmit={onSubmit}>
                     <input
                         type='text'
@@ -62,40 +63,23 @@ function Login() {
                         placeholder='Enter your email'
                     />
 
-                    <input
-                        type='password'
-                        className='block border border-grey-light w-full p-3 rounded mb-4'
-                        name='password'
-                        onChange={onChange}
-                        value={password}
-                        placeholder='Enter your password'
-                    />
-
                     <button
                         type='submit'
                         className='w-full text-center py-3 rounded bg-primary text-white hover:bg-green-dark focus:outline-none my-1'
                     >
-                        Sign In
+                        Send Email
                     </button>
                 </form>
             </div>
-            <div className='text-grey-dark mt-6'>
-                Trouble signing in?{' '}
-                <Link
-                    className='no-underline border-b border-blue text-blue'
-                    to='/forgot'
-                >
-                    Reset Password
-                </Link>
-                .
+            <div className='text-center text-sm text-grey-dark mt-4'>
+                If you have an account. An email will be sent to you with instructions on how to reset your password.
             </div>
             <div className='text-grey-dark mt-6'>
-                Don't have an account?{' '}
                 <Link
                     className='no-underline border-b border-blue text-blue'
-                    to='/register'
+                    to='/login'
                 >
-                    Register
+                    Go Back
                 </Link>
                 .
             </div>
@@ -103,4 +87,4 @@ function Login() {
     )
 }
 
-export default Login
+export default ForgotPassword

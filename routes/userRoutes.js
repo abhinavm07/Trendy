@@ -4,7 +4,7 @@ const {
   registerUser,
   loginUser,
   getMe,
-  geolocation,
+  geolocation, forgotPassword,
 } = require("../controllers/userController");
 const { getTwtData } = require("../controllers/userData");
 const { protect } = require("../middleware/authMiddleware");
@@ -13,5 +13,6 @@ router.post("/", registerUser);
 router.post("/login", loginUser);
 router.get("/me", protect, getMe);
 router.post("/twtUser", getTwtData);
+router.post("/resetPassword", forgotPassword);
 
 module.exports = router;

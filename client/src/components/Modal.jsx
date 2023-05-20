@@ -8,9 +8,9 @@ export default function Modal({context, close}) {
         <div className='modal-container'>
             <div className='my-modal'>
                 <div className='my-modal-content'>
-                    <div className='my-modal-header'>
-                        <h3 className='my-modal-title'>{title}</h3>
-                        <button className='my-modal-close' onClick={close}>X</button>
+                    <div className='my-modal-header flex flex-row'>
+                        <div><h3 className='my-modal-title'>{title}</h3></div>
+                        <div className='ml-auto'><button className='my-modal-close' onClick={close}>X</button></div>
                     </div>
                     <div className='my-modal-body'>
                         {body}

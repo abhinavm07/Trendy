@@ -127,12 +127,11 @@ const DashBoard = () => {
     }
 
     function openTrend(trend, parent) {
+        console.log(trend)
         const settings = {
             visible: true,
             parentId: parent,
             position: 'left',
-            onOpen: async () => await fetchSentiment(trend.trend)
-            ,
             onClose: () => {
                 setActionBoxSettings({
                     visible: false
@@ -149,7 +148,10 @@ const DashBoard = () => {
                     label: 'Open Trend',
                     icon: <IoOpen/>,
                 }
-            }
+            },
+            content: `
+            ${trend.trend} has been tweeted ${trend.volume} times in the twitter world.
+            `,
         };
         setActionBoxSettings(settings);
     }

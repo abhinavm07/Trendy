@@ -8,7 +8,7 @@ const staticAPI = require("../model/staticAPIdata");
 
 const client = new TwitterApi(`${process.env.BEARER_KEY}`);
 
-const { userTracking } = require("../controllers/userTracking");
+const { userTracking, isUserTracked } = require("../controllers/userTracking");
 // const { logger } = require("./autoUserTracker");
 
 const { tweetsSentiment } = require("../controllers/sentimentAnalysis");
@@ -24,7 +24,8 @@ const {
 const { getRecomendations } = require("../controllers/recommendation");
 
 const getTwtData = asyncHandler(async (req, res) => {
-  const { twtUsername, staticID, trackUser, sysUsername } = req.body;
+  const { twtUsername, staticID, trackUser } = req.body;
+  const {email: sysUsername} = req.user;
   let tweetsColec = [];
   let userAnnotes = [];
   let user;
@@ -33,12 +34,6 @@ const getTwtData = asyncHandler(async (req, res) => {
   let contextReps = [];
   let sentimentArray = [];
 
-  // retriveSysUsers();
-  // const updateData = logger(sysUsername);
-
-  // const user = await twitterClient("v2", "userByUsername", twtUsername, {
-  //   "user.fields": "public_metrics",
-  // });
 
   if (staticID) {
     staticData = await staticAPI.findById({ _id: staticID });
@@ -67,9 +62,9 @@ const getTwtData = asyncHandler(async (req, res) => {
           userTweets: userTweets,
         });
       }
-      // console.log(userTweets["_realData"]);
+
       let twtData = userTweets["_realData"]["data"];
-      // console.log(twtData);
+
       for (const twt of twtData) {
         const id = twt["id"];
         const text = twt["text"].replace(/(?:https?|ftp):\/\/[\n\S]+/g, "");
@@ -100,14 +95,11 @@ const getTwtData = asyncHandler(async (req, res) => {
       const contextVolume = calculateVolume(userAnnotes.flat());
       const sentimentVolume = calculateVolume(sentimentArray.flat());
       const contextValues = arrayValue(contextVolume);
-      // const recommendations = await getRecomendations(
-      //   contextValues,
-      //   user.data.username
-      // );
-      // console.log(recommendations);
+      const isTracked = await isUserTracked(twtUsername, sysUsername);
+
 
       if (trackUser) {
-        userTracking(user, sysUsername, tweetsColec);
+        await userTracking(user, sysUsername, tweetsColec);
       }
       return res.status(200).json({
         userData: user,
@@ -115,6 +107,7 @@ const getTwtData = asyncHandler(async (req, res) => {
         contextVolume: contextVolume,
         sentimentVolume: sentimentVolume,
         contextValues: contextValues,
+        isTracked: isTracked,
       });
     }
     return res

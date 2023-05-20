@@ -3,7 +3,7 @@ import Modal from "./Modal.jsx";
 import {ImShare, IoSearch, MdEmail} from "react-icons/all.js";
 import {toast} from "react-toastify";
 
-export default function ShareModal({type = 'tweet', action}) {
+export default function ShareModal({type = 'tweet', action, closeModal}) {
     let userEmail = '';
     const handleChange = (e) => {
         userEmail = e.target.value;
@@ -47,12 +47,11 @@ export default function ShareModal({type = 'tweet', action}) {
     }
 
     const [modalSetting, setModalSetting] = useState({
-        visible: true,
         title: `Share ${type}`,
         body: generateShareForm(),
     });
-    return (<>
-        {modalSetting.visible && <Modal context={modalSetting} close={() => setModalSetting({visible: false})}/>}
-    </>);
 
+    return (<>
+        {<Modal context={modalSetting} close={closeModal}/>}
+    </>);
 }

@@ -6,9 +6,9 @@ import {
     BarElement,
     Title,
     Tooltip,
-    Legend,
+    Legend, ArcElement,
 } from 'chart.js';
-import {Bar} from 'react-chartjs-2';
+import {Bar, Pie} from 'react-chartjs-2';
 import {BiDownload, ImShare, IoSave} from "react-icons/all.js";
 import {getSharedContents, saveTrendChart, shareContent} from "../features/favourites/favouriteSlice.js";
 import {useDispatch} from "react-redux";
@@ -21,7 +21,8 @@ ChartJS.register(
     BarElement,
     Title,
     Tooltip,
-    Legend
+    Legend,
+    ArcElement
 );
 
 function generateRandomColor(length = 6) {
@@ -35,11 +36,21 @@ function generateRandomColor(length = 6) {
 
 export function Charts({chartOptions, data, extraOptions = {}}) {
     const dispatch = useDispatch();
-    const {legendTitle, label, identifier = null, dataKey = null, chartTitle} = chartOptions;
+    const {legendTitle, label, identifier = null, dataKey = null, chartTitle, isMultiple = false, ignoreField, chartLabels} = chartOptions;
 
-    const labels = identifier ? Object.values(data).map((item) => item[identifier]) : Object.keys(data);
-    const chartData = dataKey ? Object.values(data).map((item) => item[dataKey]) : Object.values(data);
+    const isFromFavourites = extraOptions.isFromFavourites || false;
+    const isPie = extraOptions.chartType === 'pie' || false;
+    let firstKey= 0;
+    if(isMultiple) {
+        firstKey = Object.keys(data)[0];
+    }
 
+    const labels = identifier ? Object.values(data).map((item) => item[identifier]) :
+        (isFromFavourites ? Object.keys(data[0]) : isMultiple ? chartLabels : Object.keys(data));
+
+    const chartData = dataKey ? Object.values(data).map((item) => item[dataKey]) :
+        (isFromFavourites ? Object.values(data[0]) :
+            Object.values(data));
     const {height = '100px', width = '100px', canSave = false, canExport = false, canShare = false} = extraOptions;
 
     const options = {
@@ -65,16 +76,31 @@ export function Charts({chartOptions, data, extraOptions = {}}) {
 
     const colorForBar = generateRandomColor(labels.length);
 
-    const parsedData = {
+    function generateDataSet(){
+        if (isMultiple) {
+            const dataSet = [];
+            Object.keys(data).forEach((key) => {
+                dataSet.push({
+                    label: key,
+                    //filter keys in ignorefield from data[key]
+                    data: Object.keys(data[key]).filter((item) => !ignoreField.includes(item)).map((item) => data[key][item]),
+                    borderColor:  generateRandomColor(chartLabels.length),
+                    backgroundColor: generateRandomColor(chartLabels.length),
+                })
+            })
+            return dataSet;
+        }
+        return [{
+            label: label,
+            data: chartData,
+            borderColor: colorForBar,
+            backgroundColor: colorForBar,
+        }];
+    }
+
+    let parsedData = {
         labels,
-        datasets: [
-            {
-                label: label,
-                data: chartData,
-                borderColor: colorForBar,
-                backgroundColor: colorForBar,
-            },
-        ],
+        datasets: generateDataSet()
     };
 
     if (!labels.length) return <div className='no-trends'>No Trends</div>;
@@ -105,7 +131,6 @@ export function Charts({chartOptions, data, extraOptions = {}}) {
 
     function shareChart() {
         setShareModalVisibility(true);
-        console.log(shareModalVisibility)
     }
 
     async function saveChart() {
@@ -141,7 +166,7 @@ export function Charts({chartOptions, data, extraOptions = {}}) {
                     </div>)
                 }
             </div>)}
-        {shareModalVisibility && <ShareModal action={shareFunctionCallback} type='chart'/>}
-        <Bar options={options} data={parsedData} height={height} width={width}/>
+        {shareModalVisibility && <ShareModal action={shareFunctionCallback} type='chart' closeModal={()=>setShareModalVisibility(false)}/>}
+        {isPie ? <Pie data={parsedData}></Pie> : <Bar options={options} data={parsedData} height={height} width={width}/>}
     </div>;
 }

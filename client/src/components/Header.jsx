@@ -3,6 +3,7 @@ import {Link, useNavigate} from 'react-router-dom'
 import {useDispatch, useSelector} from 'react-redux'
 import {logout, reset} from '../features/auth/authSlice'
 import {IoHome} from "react-icons/io5";
+import {Tooltip} from "react-tooltip";
 
 function Header() {
     const navigate = useNavigate()
@@ -22,11 +23,18 @@ function Header() {
             </div>
             <ul>
                 {user ? (
-                    <li>
-                        <button className='btn bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded' onClick={onLogout}>
-                            <FaSignOutAlt/> Logout{' '}
-                        </button>
-                    </li>
+                    <>
+                        <li>
+                            Hi, {user.name}!
+                        </li>
+                        <li>
+                            <button
+                                className='btn bg-transparent hover:bg-white text-blue-700 font-semibold hover:text-red-500 py-2 px-4 border border-none rounded'
+                                onClick={onLogout}>
+                                <FaSignOutAlt/> Logout{' '}
+                            </button>
+                        </li>
+                    </>
                 ) : (
                     <>
                         {/*<li>*/}

@@ -28,9 +28,9 @@ export default function SearchBar({
                             className='input  input-info'
                         />
                         <div className='input-group-append'>
-                            <button type='submit' className='btn searchButton' disabled={disabled}>
+                            {buttonIcon && <button type='submit' className='btn searchButton' disabled={disabled}>
                                 {buttonIcon}
-                            </button>
+                            </button>}
                         </div>
                     </div>
                 </div>

@@ -30,7 +30,7 @@ const shareContent = async (savedInfo, token) => {
     },
   };
   const body = { savedInfo };
-  console.log(savedInfo);
+
   const response = await axios.post(`${API_URL}shareContent`, body, config);
   return response.data;
 };

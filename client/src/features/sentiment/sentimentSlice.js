@@ -14,7 +14,8 @@ export const emotions = createAsyncThunk(
   "sentiment/emotions",
   async (emotion, thunkAPI) => {
     try {
-      return await sentimentService.emotion(emotion);
+      const token = thunkAPI.getState().auth.user.token;
+      return await sentimentService.emotion(emotion, token);
     } catch (error) {
       const message =
         (error.response &&

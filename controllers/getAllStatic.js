@@ -77,15 +77,11 @@ const appendingData = async (user, tweetsColec) => {
   let UserDataExists;
   UserDataExists = await cleanData.findOne({
     twitterUser: user["data"]["username"],
-  }); // console.log(UserDataExists);
-  //   console.log("\n");
-  //   console.log(user["data"]["username"]);
-  //   console.log("\n");
+  });
   if (UserDataExists) {
     userData = await UserDataExists.twtData;
     tweetsColec.forEach((element) => {
       if (!JSON.stringify(userData).includes(JSON.stringify(element))) {
-        // console.log(element);
         userData.push(element);
       }
     });

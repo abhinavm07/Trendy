@@ -16,7 +16,7 @@ export default function Navigation(items) {
     return (
         <ul className='menu w-80 bg-base-100 text-base-content'>
             {Object.values(items)[0].map((item) => (
-                <li key={item.name} className={getActiveClass(item.path)}>
+                !item?.hidden && <li key={item.name} className={getActiveClass(item.path)}>
                     <Link to={item.path} className={item.disabled ? 'disabledLink' : ''}>
                         {item.icon}
                         {item.name}
