@@ -28,8 +28,8 @@ export default function Watchlist() {
 
     const tableConfig = {
         data: watchlist,
-        header: ['Username', 'Watching Since'],
-        dataKeys: ['trackedUser', 'createdAt::datetime'],
+        header: ['Username', 'Watching Since', 'Last Updated'],
+        dataKeys: ['trackedUser', 'createdAt::datetime', 'updatedAt::datetime'],
         actions: [
             {
                 name: <AiOutlinePauseCircle/>,

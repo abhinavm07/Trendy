@@ -13,6 +13,7 @@ import {IoSave} from "react-icons/io5";
 import TweetBox from "../components/TweetBox.jsx";
 import {saveTweet} from "../features/favourites/favouriteSlice.js";
 import {addTrack} from "../features/tracking/trackingSlice.js";
+import {formatNumber} from "../features/helpers.js";
 
 
 const UserAnalytics = () => {
@@ -47,10 +48,16 @@ const UserAnalytics = () => {
 
     const onSubmit = async (e) => {
         e.preventDefault()
-        const twtuserName = {twtUsername}
-        const result = await dispatch(twtUsers(twtuserName))
+        await submitSearch();
+    }
+
+    async function submitSearch(user = twtUsername) {
+        dispatch(reset())
+        const twtUsername = user
+        const result = await dispatch(twtUsers({twtUsername}))
         setIsTracked(result.payload?.isTracked || false)
     }
+
     const onChange = (e) => {
         setFormData((prevstate) => ({
             ...prevstate,
@@ -100,6 +107,13 @@ const UserAnalytics = () => {
             setIsTracked(false);
         }
         toast[status](msg || 'You are now watching this user.')
+    }
+
+    async function changeUser(user) {
+        setFormData({
+            twtUsername: user,
+        })
+        await submitSearch(user);
     }
 
     return (
@@ -189,8 +203,24 @@ const UserAnalytics = () => {
                 </div>
                 }
             </div>
-            {twtUser?.userData && <div className='flex flex-col'>
-                <TweetBox content={twtUser} onSave={saveCurrentTweet}/>
+            {twtUser?.userData && <div className='flex flex-row'>
+                <div className='w-4/5'>
+                    <TweetBox content={twtUser} onSave={saveCurrentTweet}/>
+                </div>
+                {twtUser?.similar && <div className='mt-14 ml-5 recommendation sidetrend tweetbox trendbox'>
+                    <div className='tweetbox-title'>Similar Accounts</div>
+                    {twtUser?.similar.length <= 0 && <div className='individualTrends flex'>Nothing to show here.</div>}
+                    {Object.values(twtUser?.similar).map((s, index) => (
+                        <div key={index}>
+                            <div key={index} className='individualTrends flex'
+                                 onClick={() => changeUser(s)}
+                                 id={'similar' + index}>
+                                <a href='#'>{s}</a>
+                            </div>
+                            <Tooltip anchorId={'similar' + index} content='Click here for their analytics.'/>
+                        </div>)
+                    )}
+                </div>}
             </div>
             }
             {

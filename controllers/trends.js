@@ -1,5 +1,4 @@
 const express = require("express");
-const app = express();
 const { TwitterApi } = require("twitter-api-v2");
 require("dotenv/config");
 
@@ -87,7 +86,6 @@ const nearMeT = async (req, res, next) => {
 };
 
 async function getTrendSentiment(trend) {
-  //console.log(trend)
   if (!trend) return "neutral";
   const clientResponse = await client.v2.search(trend, {
     "tweet.fields": "public_metrics",
@@ -122,11 +120,10 @@ const trendTweets = async (req, res) => {
     if (i < 50) {
       tweetColec.push({ tweetID: tweet.id, tweet: tweet.text });
     } else if (i >= 50) {
-      console.log(i);
       break;
     }
   }
-  console.log(i);
+
   tweetColec.push([`recent tweet count : ${recentTweets.data[0].tweet_count}`]);
   res.json(tweetColec);
 };

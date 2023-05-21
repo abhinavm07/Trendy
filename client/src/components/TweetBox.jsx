@@ -1,7 +1,7 @@
 import SentimentSearchResults from "./SentimentSearchResults.jsx";
 import {IoSave, IoShare} from "react-icons/io5";
 import {Tooltip} from "react-tooltip";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Modal from "./Modal.jsx";
 import {ImShare} from "react-icons/all.js";
 import ShareModal from "./ShareModal.jsx";
@@ -80,12 +80,29 @@ export default function TweetBox({content, onSave, canSave = true, canShare = fa
         }
     }
 
+    const [tweetDp, setTweetDp] = useState( '');
+
+    function randomlyPickSrc() {
+        const imgSrc = [
+            'https://cdn4.iconfinder.com/data/icons/iconsimple-logotypes/512/twitter-512.png',
+            'https://cdn-icons-png.flaticon.com/512/560/560200.png',
+            'https://www.pngmart.com/files/21/Admin-Profile-Vector-PNG-Clipart.png'
+        ];
+        const index = Math.floor(Math.random() * imgSrc.length);
+        setTweetDp(imgSrc[index]);
+    }
+
+    useEffect(() => {
+        randomlyPickSrc();
+    }, [tweetDp]);
+
     return (<div>
         {
             tweetContextModal.visible &&
             <Modal context={tweetContextModal} close={() => setTweetContextModal({visible: false})}/>
         }
-        {shareModalVisibility && <ShareModal action={shareFunctionCallback} type='tweet' closeModal={()=>setShareModalVisibility(false)}/>}
+        {shareModalVisibility &&
+            <ShareModal action={shareFunctionCallback} type='tweet' closeModal={() => setShareModalVisibility(false)}/>}
         <br/>
         <div className='w-full flex '>
         </div>
@@ -98,9 +115,9 @@ export default function TweetBox({content, onSave, canSave = true, canShare = fa
                 <div className='justify-center'>
                     <div className='carousel carousel-vertical rounded-box all-tweet-list'>
                         {actualTweetData.map((data) => {
-                            const index = Math.random().toString(36).substring(7);
+                                const index = Math.random().toString(36).substring(7);
 
-                            return (<div className='carousel-item recent-tweet' key={index}>
+                                return (<div className='carousel-item recent-tweet' key={index}>
                                     <div className={getClassName(data.sentiment)}>
                                         <div className='warning-banner'>
                                             <div
@@ -116,7 +133,7 @@ export default function TweetBox({content, onSave, canSave = true, canShare = fa
                                         <div className='avatar-username'>
                                             <div className='avatar'>
                                                 <img
-                                                    src='https://cdn4.iconfinder.com/data/icons/iconsimple-logotypes/512/twitter-512.png'/>
+                                                    src={tweetDp}/>
                                             </div>
                                             <div className='username-box'>
                                                 <span className='name'>

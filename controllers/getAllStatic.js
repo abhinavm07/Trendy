@@ -13,7 +13,6 @@ const cleanData = require("../model/cleanData");
 const getID = async () => {
   let idList = [];
   const staticData = await staticAPI.find({});
-  // console.log(staticData);
   staticData.forEach((element) => {
     idList.push(JSON.stringify(element["_id"]).replace(/['"]+/g, ""));
   });
@@ -40,35 +39,38 @@ const cleanStatic = async (idList) => {
       userTweets = staticData["userTweets"];
       if (userTweets) {
         let twtData = userTweets["_realData"]["data"];
-        for (const twt of twtData) {
-          if (twt) {
-            const id = twt["id"];
-            const twtSentiment = await tweetsSentiment(twt["text"]);
-            const annotations = twt["context_annotations"];
-            if (annotations) {
-              const context = tweetContext(annotations, id);
-              userAnnotes.push(context[id]);
-              tweetsColec.push({
-                id: twt["id"],
-                tweet: twt["text"],
-                sentiment: twtSentiment,
-                context: context[id],
-              });
-            } else {
-              tweetsColec.push({
-                id: twt["id"],
-                tweet: twt["text"],
-                sentiment: twtSentiment,
-              });
+        if (Array.isArray(twtData)) {
+          for (const twt of twtData) {
+            if (twt) {
+              const id = twt["id"];
+              const twtSentiment = await tweetsSentiment(twt["text"]);
+              const annotations = twt["context_annotations"];
+              if (annotations) {
+                const context = tweetContext(annotations, id);
+                userAnnotes.push(context[id]);
+                tweetsColec.push({
+                  id: twt["id"],
+                  tweet: twt["text"],
+                  sentiment: twtSentiment,
+                  context: context[id],
+                });
+              } else {
+                tweetsColec.push({
+                  id: twt["id"],
+                  tweet: twt["text"],
+                  sentiment: twtSentiment,
+                });
+              }
             }
           }
+        } else {
+          console.log(twtData);
         }
-        const contextVolume = await calculateVolume(userAnnotes.flat());
+        calculateVolume(userAnnotes.flat());
         appendingData(user, tweetsColec);
       }
     }
   }
-
 };
 
 const appendingData = async (user, tweetsColec) => {
@@ -106,7 +108,7 @@ const appendingData = async (user, tweetsColec) => {
   });
   const contextVolume = calculateVolume(userAnnotes.flat());
   const contextValues = arrayValue(contextVolume);
-  const appendUserData = await cleanData.findOneAndUpdate(
+  await cleanData.findOneAndUpdate(
     {
       twitterUser: user["data"]["username"],
     },

@@ -2,17 +2,12 @@ const asyncHandler = require("express-async-handler");
 const savedTweetsSchema = require("../model/savedTweetsSchema");
 
 const saveTweets = asyncHandler(async (req, res) => {
-  const {user, tweetData} = req.body;
+  const { user, tweetData } = req.body;
 
-  const {id: userId, name, public_metrics, username} = user;
-  const {id, tweet, sentiment, context} = tweetData;
+  const { id: userId, name, username } = user;
+  const { id, tweet, sentiment, context } = tweetData;
   // validation
-  if (
-    !userId ||
-    !name ||
-    !id ||
-    !tweet
-  ) {
+  if (!userId || !name || !id || !tweet) {
     res.status(400);
     throw new Error("Please Include all fields");
   }
@@ -38,7 +33,7 @@ const saveTweets = asyncHandler(async (req, res) => {
     if (stackCharts) {
       res.status(201).json({
         _id: savedTweetsSchema.tweetID,
-        success: true
+        success: true,
       });
     } else {
       res.status(400);
@@ -50,7 +45,6 @@ const saveTweets = asyncHandler(async (req, res) => {
 const deleteTweets = async (req, res) => {
   const { id: tweetID } = req.params;
   const delTweets = await savedTweetsSchema.findByIdAndDelete({ _id: tweetID });
-  console.log(delChart);
   res.status(200).json({ msg: `Chart with the ID of : ${tweetID} deleted !` });
 };
 
@@ -61,7 +55,9 @@ const addData = async (req, res) => {
 
 const retriveTweets = async (req, res) => {
   const { email } = req.user;
-  const savedTweets = await savedTweetsSchema.find({ createdBy: email }).sort({createdAt: -1});
+  const savedTweets = await savedTweetsSchema
+    .find({ createdBy: email })
+    .sort({ createdAt: -1 });
   if (savedTweets) {
     res.status(200).json(savedTweets);
   } else {

@@ -12,8 +12,6 @@ const analyzer = new SentimentAnalyzer("English", PorterStemmer, "afinn");
 const emotion = (req, res) => {
   const { data } = req.body;
 
-  console.log("Hello");
-
   const sentiment = getSentiment(data);
 
   if (sentiment === 1) {

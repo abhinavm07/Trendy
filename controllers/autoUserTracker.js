@@ -13,13 +13,10 @@ let trackedID = [];
 
 const { tweetsSentiment } = require("./sentimentAnalysis");
 
-const autoTracking = async (req, res) => {
-  const { sysUsername } = req.body;
+const autoTracking = async (sysUsername) => {
   const getID = await idList();
 
   for (const trackID of getID) {
-    // tweetsColec = [];
-    // console.log(trackID);
     let retriveData = await trackingSchema.findById({
       _id: trackID,
     });
@@ -29,7 +26,7 @@ const autoTracking = async (req, res) => {
       "user.fields": "public_metrics",
     });
     const userId = user?.data?.id || null;
-    // console.log(user["data"]["username"], userId);
+
     if (userId) {
       const userTweets = await client.v2.userTimeline(`${userId}`, {
         exclude: "retweets,replies",
@@ -38,24 +35,18 @@ const autoTracking = async (req, res) => {
       if (userTweets) {
         tweetAndAnnots(userTweets, user, sysUsername, trackID);
       }
-      // console.log(
-      //   "User account is not public, please search for a user with public tweets."
-      // );
     }
-    // console.log("User not found with the given username.");
   }
 
-  res.status(200).json(
-    await trackingSchema.findOne({
-      trackedBy: sysUsername,
-      trackingStatus: true,
-    })
-  );
+  return { message: "CRON RAN SUCCESSFULLY" };
 };
 
 const idList = async () => {
-  //
-  const trackedData = await trackingSchema.find({ trackingStatus: true });
+  const trackedData = await trackingSchema.find(
+    { trackingStatus: true },
+    "_id"
+  );
+  console.log(trackedData);
   trackedData.forEach((element) => {
     const objID = JSON.stringify(element["_id"]).replace(/['"]+/g, "");
     if (!trackedID.includes(objID)) {
@@ -98,22 +89,24 @@ const getFreshData = async (user, sysUsername, tweetsColec, trackID) => {
       trackedUser: user["data"]["username"],
       trackingStatus: true,
     });
-    const userData = await UserDataExists.twtData;
+    if (UserDataExists) {
+      const userData = await UserDataExists.twtData;
 
-    userData.forEach((element) => {
-      if (element["context"]) {
-        userAnnotes.push(element["context"]);
-      }
-    });
-    const contextVolume = calculateVolume(userAnnotes.flat());
-    const appendUserData = await trackingSchema.findOneAndUpdate(
-      {
-        trackedBy: sysUsername,
-        trackedUser: user["data"]["username"],
-        trackingStatus: true,
-      },
-      { contextVolume: contextVolume }
-    );
+      userData.forEach((element) => {
+        if (element["context"]) {
+          userAnnotes.push(element["context"]);
+        }
+      });
+      const contextVolume = calculateVolume(userAnnotes.flat());
+      const appendUserData = await trackingSchema.findOneAndUpdate(
+        {
+          trackedBy: sysUsername,
+          trackedUser: user["data"]["username"],
+          trackingStatus: true,
+        },
+        { contextVolume: contextVolume }
+      );
+    }
   }
 };
 

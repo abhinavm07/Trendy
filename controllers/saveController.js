@@ -85,9 +85,7 @@ const addDataTweet = async (req, res) => {
 const retrieveTweets = async (req, res) => {
   const { userID } = req.body;
   const savedTweets = await savedTweetsSchema.find({ createdBy: userID });
-  res
-    .status(200)
-    .json(savedTweets);
+  res.status(200).json(savedTweets);
 };
 
 const savedTweets = async (req, res) => {
@@ -101,23 +99,6 @@ const savedTweets = async (req, res) => {
     }
   }
 };
-
-// const unsaveTweet = async (req, res) => {
-//   //check if chart has been saved savedChart()
-//   //if savedChart true then check if chart has been shared in shared table
-//   //if shared then set isDeleted as current date
-//   const { userID, savedID, isDeleted } = req.body;
-//   if (userID && savedID && !isDeleted) {
-//     console.log("Out");
-//     const shared = await sharedSchema.findOne({ _id: savedID });
-//     if (shared["createdBy"] == userID) {
-//       sharedSchema["isDeleted"] = Date;
-//       res.status(200).json({ msg: shared });
-//     } else {
-//       res.status(404).json({ msg: "No such tweet found" });
-//     }
-//   }
-// };
 
 module.exports = {
   saveTweets,

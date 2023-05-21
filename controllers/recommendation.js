@@ -6,66 +6,60 @@ const getRecomendations = async (userInput, twtUsername) => {
   for (const element of contexts) {
     contextsList.push(element["contextValue"]);
   }
-  const result = recomendations(contextsList, userInput, twtUsername);
+  const result = recommendations(contextsList, userInput, twtUsername);
   return result;
 };
 
-const recomendations = async (items, userInput, twtUsername) => {
-  const tf = items.map((item) => {
-    const itemTf = new Map();
-    item.forEach((term) => {
-      if (itemTf.has(term)) {
-        itemTf.set(term, itemTf.get(term) + 1);
-      } else {
-        itemTf.set(term, 1);
-      }
-    });
-    return itemTf;
-  });
-  //
-  const idf = new Map();
-  userInput.forEach((term) => {
-    let count = 0;
-    for (let i = 0; i < items.length; i++) {
-      if (tf[i].has(term)) {
-        count++;
-      }
-    }
-    idf.set(term, Math.log(items.length / count));
-  });
+const recommendations = async (items, userInput, twtUsername) => {
+  const tf = [];
+  const idf = {};
+  const termsSet = new Set();
+  const termCount = {};
 
-  //
+  for (const item of items) {
+    const itemTf = {};
+    for (const term of item) {
+      itemTf[term] = (itemTf[term] || 0) + 1;
+      termsSet.add(term);
+      termCount[term] = (termCount[term] || 0) + 1;
+    }
+    tf.push(itemTf);
+  }
+
+  for (const term of userInput) {
+    const count = termCount[term] || 0;
+    idf[term] = Math.log(items.length / count);
+  }
 
   const tfidf = tf.map((itemTf) => {
-    const itemTfidf = new Map();
-    itemTf.forEach((count, term) => {
-      if (idf.has(term)) {
-        itemTfidf.set(term, count * idf.get(term));
+    const itemTfidf = {};
+    for (const [term, count] of Object.entries(itemTf)) {
+      const termIdf = idf[term];
+      if (termIdf) {
+        itemTfidf[term] = count * termIdf;
       }
-    });
+    }
     return itemTfidf;
   });
-  //
 
+  const userInputSet = new Set(userInput);
   const similarities = tfidf.map((itemTfidf) => {
     let numerator = 0;
     let itemDenominator = 0;
     let userInputDenominator = 0;
-    itemTfidf.forEach((value, term) => {
-      userInputDenominator += idf.get(term) ** 2;
-      if (userInput.includes(term)) {
-        numerator += value * idf.get(term);
+    for (const [term, value] of Object.entries(itemTfidf)) {
+      const termIdf = idf[term];
+      userInputDenominator += termIdf ** 2;
+      if (userInputSet.has(term)) {
+        numerator += value * termIdf;
       }
       itemDenominator += value ** 2;
-    });
+    }
     userInputDenominator = Math.sqrt(userInputDenominator);
     itemDenominator = Math.sqrt(itemDenominator);
     const denominator = userInputDenominator * itemDenominator;
-    // console.log(itemTfidf, numerator / denominator);
     return numerator / denominator;
   });
-
-  // 3. Compute the TF-IDF of each item in the items array
 
   const recommendations = items
     .map((item, index) => [item, similarities[index]])
@@ -73,24 +67,22 @@ const recomendations = async (items, userInput, twtUsername) => {
     .sort(([, similarityA], [, similarityB]) => similarityB - similarityA)
     .map(([item, _]) => item);
 
-  const recomendResult = Array.from(recommendations);
-  let similarUsers = [];
-  for (const element of recomendResult) {
+  const similarUsersSet = new Set();
+  for (const element of recommendations) {
     const similarDataExists = await cleanData.findOne({
       contextValue: element,
     });
-    if (similarDataExists) {
-      if (similarDataExists.twitterUser !== twtUsername) {
-        if (
-          !similarUsers.includes(similarDataExists.twitterUser) &&
-          similarUsers.length < 5
-        ) {
-          similarUsers.push(similarDataExists.twitterUser);
-        }
-      }
+    if (
+      similarDataExists &&
+      similarDataExists.twitterUser.toLowerCase() !==
+        twtUsername.toLowerCase() &&
+      similarUsersSet.size < 5
+    ) {
+      similarUsersSet.add(similarDataExists.twitterUser);
     }
   }
-  return similarUsers;
+  console.log(Array.from(similarUsersSet));
+  return Array.from(similarUsersSet);
 };
 
 module.exports = { getRecomendations };

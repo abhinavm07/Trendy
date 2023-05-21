@@ -6,7 +6,6 @@ import TrackUser from "../pages/TrackUser.jsx";
 import Home from "../pages/Home.jsx";
 import ComparingUsers from "../pages/ComparingUsers.jsx";
 import UserAnalytics from "../pages/UserAnalytics.jsx";
-import UnderConstruction from "./UnderConstruction.jsx";
 import Favourites from "../pages/Favourites.jsx";
 import Watchlist from "../pages/Watchlist.jsx";
 import Settings from "../pages/Setting.jsx";

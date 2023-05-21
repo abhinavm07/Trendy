@@ -6,10 +6,10 @@ const twitterClient = require("./dataFetcher");
 
 const staticAPI = require("../model/staticAPIdata");
 
-const client = new TwitterApi(`${process.env.BEARER_KEY}`);
-
 const { userTracking, isUserTracked } = require("../controllers/userTracking");
 // const { logger } = require("./autoUserTracker");
+
+const { getID } = require("../controllers/getAllStatic");
 
 const { tweetsSentiment } = require("../controllers/sentimentAnalysis");
 
@@ -19,13 +19,11 @@ const {
   arrayValue,
 } = require("../controllers/tweetContexts");
 
-// const { retriveSysUsers } = require("../controllers/admin");
-
 const { getRecomendations } = require("../controllers/recommendation");
 
 const getTwtData = asyncHandler(async (req, res) => {
   const { twtUsername, staticID, trackUser } = req.body;
-  const {email: sysUsername} = req.user;
+  const { email: sysUsername } = req.user;
   let tweetsColec = [];
   let userAnnotes = [];
   let user;
@@ -33,7 +31,6 @@ const getTwtData = asyncHandler(async (req, res) => {
   let userTweets;
   let contextReps = [];
   let sentimentArray = [];
-
 
   if (staticID) {
     staticData = await staticAPI.findById({ _id: staticID });
@@ -96,7 +93,7 @@ const getTwtData = asyncHandler(async (req, res) => {
       const sentimentVolume = calculateVolume(sentimentArray.flat());
       const contextValues = arrayValue(contextVolume);
       const isTracked = await isUserTracked(twtUsername, sysUsername);
-
+      const similar = await getRecomendations(contextValues, twtUsername);
 
       if (trackUser) {
         await userTracking(user, sysUsername, tweetsColec);
@@ -108,6 +105,7 @@ const getTwtData = asyncHandler(async (req, res) => {
         sentimentVolume: sentimentVolume,
         contextValues: contextValues,
         isTracked: isTracked,
+        similar,
       });
     }
     return res
